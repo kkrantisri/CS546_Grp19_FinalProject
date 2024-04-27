@@ -111,17 +111,53 @@ export const deletePost = async (id) => {
 
   return {...deletionInfo.value, deleted: true};
 };
-export const createComment = async (postId,) =>{
+export const createComment = async (postId,userId,userName,content) =>{
+  postId = helpers.checkId(postId,'postId')
+  userId = helpers.checkId(userId,'userId')
+  userName = helpers.checkString(userName,'userName')
+  content = helpers.checkString(content,'content')
+  const postCollection = await posts()
+  const post = await postCollection.findOne({_id: new ObjectId(postId)});
+  if(post === null){
+    throw 'No post with that postId'
+  }
+  const userCollection = await users()
+  const user = await userCollection.findOne({_id:new ObjectId(userId)});
+  if(user===null){
+    throw 'No user with that userId'
+  }
+  const postedAt = new Date().toUTCString();
+  const newComment = {
+    _id : new ObjectId(),
+    postId : postId,
+    userId : userId,
+    userName : userName,
+    content : content,
+    postedAt : postedAt
+  }
+  const updateInfo = await postCollection.updateOne({_id: new ObjectId(postId)}, {$push: {comments: newReview}},{returnDocument:'after'});
+  if(!updateInfo){
+    throw `Error: Update failed! Could not add the review for the product with productId ${postId}`;
+  }
+  return updateInfo;
 
+};
+export const getAllComments = async (postId) =>{
+  postId = helpers.checkId(postId,'postId')
+  const postCollection = await posts();
+  const post = await postCollection.findOne({_id: new ObjectId(postId)});
+  if (!post) throw 'No post with that postId';
+  if(post.comments.length===0) throw 'No comments for the post'
+  return post.comments;
 }
 
 // Function to retrieve comments by post ID
-export const getCommentsByPostId = async (postId) => {
-  const commentCollection = await comments();
-  const postComments = await commentCollection.find({ postId: postId }).toArray();
+// export const getCommentsByPostId = async (postId) => {
+//   const commentCollection = await comments();
+//   const postComments = await commentCollection.find({ postId: postId }).toArray();
 
-  return postComments;
-};
+//   return postComments;
+// };
 
 // Function to search posts by tag
 // export const searchByTag = async (tag) => {
@@ -135,23 +171,46 @@ export const getCommentsByPostId = async (postId) => {
 // };
 
 // Function to get user by comment ID
-export const getUserByCommentId = async (commentId) => {
-  const commentCollection = await comments();
-  const comment = await commentCollection.findOne({ _id: new ObjectId(commentId) });
+// export const getUserByCommentId = async (commentId) => {
+//   const commentCollection = await comments();
+//   const comment = await commentCollection.findOne({ _id: new ObjectId(commentId) });
 
-  if (!comment) {
-    throw new Error('Comment not found');
-  }
+//   if (!comment) {
+//     throw new Error('Comment not found');
+//   }
 
-  const userCollection = await users();
-  const user = await userCollection.findOne({ _id: new ObjectId(comment.userId) });
+//   const userCollection = await users();
+//   const user = await userCollection.findOne({ _id: new ObjectId(comment.userId) });
 
-  if (!user) {
-    throw new Error('User not found');
-  }
+//   if (!user) {
+//     throw new Error('User not found');
+//   }
 
-  user._id = user._id.toString();
-  return user;
+//   user._id = user._id.toString();
+//   return user;
+// };
+
+export const updateLikes = async(postId)=>{
+  postId = helpers.checkId(postId,'postId')
+  const postCollection = await posts();
+  const newPost = await postCollection.findOneAndUpdate({_id: new ObjectId(postId)},
+  {$inc: { likes: 1 }},
+  {returnDocument: 'after'});
+  if (newPost.lastErrorObject.n === 0)
+      throw [404, `Could not update the post with id ${postId}`];
+
+  return newPost.value;
+};
+export const updateDislikes = async(postId)=>{
+  postId = helpers.checkId(postId,'postId')
+  const postCollection = await posts();
+  const newPost = await postCollection.findOneAndUpdate({_id: new ObjectId(postId)},
+  {$inc: { dislikes: 1 }},
+  {returnDocument: 'after'});
+  if (newPost.lastErrorObject.n === 0)
+      throw [404, `Could not update the post with id ${postId}`];
+
+  return newPost.value;
 };
 
 
