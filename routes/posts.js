@@ -4,7 +4,6 @@ import {postData, userData} from '../data/index.js';
 import helpers from '../helper.js';
 
 router.route('/new').get(async (req, res) => {
-  
   res.render('posts/createPost');
 });
 

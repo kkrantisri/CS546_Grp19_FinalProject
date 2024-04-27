@@ -51,15 +51,13 @@ export const createPost = async (title, content, userId, tags,course) => {
   const insertInfo = await postCollection.insertOne(newPost);
 
   if (!insertInfo.acknowledged || !insertInfo.insertedId) {
-    throw new Error('Could not create post');
+    throw 'Could not create post';
   }
 
   const postId = insertInfo.insertedId.toString();
   const createdPost = await getPostById(postId);
   return createdPost;
 };
-
-// Function to update post
 export const updatePost = async (id,updatedPost) => {
     const updatedPostData = {};
     
