@@ -1,0 +1,67 @@
+<main>
+    <div class="signup-page">
+        <h2>Signup Form</h2>
+        <form action="/signup" method="POST">
+            <div class="username-container">
+                <label for="username">Username:</label><br>
+                <input type="text" id="username" name="username" required><br>
+            </div>
+
+            <div class="password-container">
+                <label for="password">Password:</label><br>
+                <input type="password" id="password" name="password" required><br>
+            </div>
+
+            <div class="email-container">
+                <label for="email">Email:</label><br>
+                <input type="email" id="email" name="email" required><br>
+            </div>
+
+            <div class="fullname-container">
+                <label for="fullname">Full Name:</label><br>
+                <input type="text" id="fullname" name="fullname" required><br>
+            </div>
+
+            <div class="major-container">
+                <label for="major">Major:</label><br>
+                <input type="text" id="major" name="major" required><br>
+            </div>
+
+            <div class="languages-container">
+                <label for="languages">Languages:</label><br>
+                <input type="text" id="languages" name="languages" required><br>
+            </div>
+
+            <div class="coursesEnrolled-container">
+                <label for="coursesEnrolled">Courses Enrolled:</label><br>
+                <select id="coursesEnrolled" name="coursesEnrolled" required><br>
+
+                <option value="">Other</option>
+                                        <option value="CS546">Web programming</option>
+                                        <option value="CS555">Agile</option>
+                                        <option value="CS545">Human Computer Interaction</option>
+                                        <option value="CS570">Data Structures</option>
+                                        <option value="CS556">Mathematical Foundations of Machine Learning</option>
+                                        <option value="cs513">Knowledge Discovery and data Mining</option>
+                                        
+            </div>
+
+            <div class="reviews-container">
+                <label for="reviews">Reviews:</label><br>
+                <input type="text" id="reviews" name="reviews"><br>
+            </div>
+
+            <div class="bio-container">
+                <label for="bio">Bio:</label><br>
+                <textarea id="bio" name="bio" rows="4" cols="50"></textarea><br>
+            </div>
+
+            <div class="gradyear-container">
+                <label for="gradyear">Graduation Year:</label><br>
+                <input type="text" id="gradyear" name="gradyear" required><br>
+            </div>
+
+            <button type="submit">Sign Up</button>
+        </form>
+    </div>
+</main>
