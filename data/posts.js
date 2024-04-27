@@ -1,45 +1,53 @@
 import { posts, users } from "../config/mongoCollections.js";
 import { ObjectId } from 'mongodb';
-
+import * as userData from './users.js'
+import helpers from '../helper.js'
 // Function to get a post by its ID
-export const getPostById = async (postId) => {
-  if (!postId || typeof postId !== 'string' || postId.trim().length === 0 || !ObjectId.isValid(postId)) {
-    throw new Error('Invalid post ID');
-  }
+export const getPostById = async (id) => {
+  id = helpers.checkId(id);
   const postCollection = await posts();
-  const post = await postCollection.findOne({ _id: new ObjectId(postId) });
+  const post = await postCollection.findOne({ _id: new ObjectId(id) });
   if (!post) {
-    throw new Error('Post not found');
+    throw 'Error: Post not found';
   }
-  post._id = post._id.toString();
+  //post._id = post._id.toString();
   return post;
 };
 // Function to get all posts
 export const getAllPosts = async () => {
   const postCollection = await posts();
-  const allPosts = await postCollection.find({}).toArray();
-
-  return allPosts.map(post => {
-    post._id = post._id.toString();
-    return post;
-  });
+  return await postCollection.find({}).toArray();
+};
+export const getPostsByTag = async (tag)=>{
+  tag = helpers.checkString(tag,'Tag')
+  const postCollection = await posts();
+    return await postCollection.find({tags: tag}).toArray();
 };
 // Function to create a new post
-export const createPost = async (title, content, authorId, tags) => {
-  if (!title || !content || !authorId || !tags || !Array.isArray(tags) || tags.length === 0) {
-    throw new Error('Invalid post data');
+export const createPost = async (title, content, userId, tags,course) => {
+  title = helpers.checkString(title, 'Title');
+  content = helpers.checkString(content,'content');
+  course = helpers.checkString(course,'course')
+  userId = validation.checkId(userId, 'User ID');
+  if (!Array.isArray(tags)) {
+    tags = [];
+  } else {
+    tags = validation.checkStringArray(tags, 'Tags');
   }
-  const postCollection = await posts();
+  //const userThatPosted = await userData.getUserById(userId);
+  const last_updated_at = new Date().toUTCString()
   const newPost = {
-    title: title,
-    content: content,
-    authorId: authorId,
-    tags: tags.map(tag => tag.trim()),
+    title : title,
+    content :content,
+    userId: userId,
+    course : course,
+    tags: tags,
+    last_updated_at : last_updated_at,
     likes: 0,
     dislikes: 0,
     comments: []
   };
-
+  const postCollection = await posts();
   const insertInfo = await postCollection.insertOne(newPost);
 
   if (!insertInfo.acknowledged || !insertInfo.insertedId) {
@@ -51,48 +59,61 @@ export const createPost = async (title, content, authorId, tags) => {
   return createdPost;
 };
 
-// Function to update post (like or dislike)
-export const updatePost = async (postId, action) => {
-  if (!postId || typeof postId !== 'string' || postId.trim().length === 0 || !ObjectId.isValid(postId)) {
-    throw new Error('Invalid post ID');
-  }
+// Function to update post
+export const updatePost = async (id,updatedPost) => {
+    const updatedPostData = {};
+    
 
-  const postCollection = await posts();
-  const updateAction = {};
+    
+    if (updatedPost.tags) {
+      updatedPostData.tags = validation.checkStringArray(
+        updatedPost.tags,
+        'Tags'
+      );
+    }
 
-  if (action === 'like') {
-    updateAction.likes = 1;
-  } else if (action === 'dislike') {
-    updateAction.dislikes = 1;
-  } else {
-    throw new Error('Invalid action');
-  }
+    if (updatedPost.title) {
+      updatedPostData.title = validation.checkString(
+        updatedPost.title,
+        'Title'
+      );
+    }
 
-  const updatedInfo = await postCollection.updateOne({ _id: new ObjectId(postId) }, { $inc: updateAction });
+    if (updatedPost.content) {
+      updatedPostData.content = validation.checkString(updatedPost.content, 'content');
+    }
+    if (updatedPost.course) {
+      updatedPostData.course = validation.checkString(updatedPost.course, 'course');
+    }
+    updatedPostData.last_updated_at = new Date().toUTCString()
+    const postCollection = await posts();
+    let newPost = await postCollection.findOneAndUpdate(
+      {_id: new ObjectId(id)},
+      {$set: updatedPostData},
+      {returnDocument: 'after'}
+    );
+    if (newPost.lastErrorObject.n === 0)
+      throw [404, `Could not update the post with id ${id}`];
 
-  if (updatedInfo.modifiedCount === 0) {
-    throw new Error('Could not update post');
-  }
-
-  const updatedPost = await getPostById(postId);
-  return updatedPost;
+    return newPost.value;
+  
 };
 
 // Function to delete a post
-export const deletePost = async (postId) => {
-  if (!postId || typeof postId !== 'string' || postId.trim().length === 0 || !ObjectId.isValid(postId)) {
-    throw new Error('Invalid post ID');
-  }
+export const deletePost = async (id) => {
+  id = validation.checkId(id);
 
   const postCollection = await posts();
-  const deletionInfo = await postCollection.deleteOne({ _id: new ObjectId(postId) });
+  const deletionInfo = await postCollection.findOneAndDelete({ _id: new ObjectId(postId) });
 
-  if (deletionInfo.deletedCount === 0) {
-    throw new Error('Could not delete post');
-  }
+  if (deletionInfo.lastErrorObject.n === 0)
+      throw [404, `Could not delete post with id of ${id}`];
 
-  return `Post with ID ${postId} has been deleted`;
+  return {...deletionInfo.value, deleted: true};
 };
+export const createComment = async (postId,) =>{
+
+}
 
 // Function to retrieve comments by post ID
 export const getCommentsByPostId = async (postId) => {
@@ -103,15 +124,15 @@ export const getCommentsByPostId = async (postId) => {
 };
 
 // Function to search posts by tag
-export const searchByTag = async (tag) => {
-  const postCollection = await posts();
-  const taggedPosts = await postCollection.find({ tags: tag }).toArray();
+// export const searchByTag = async (tag) => {
+//   const postCollection = await posts();
+//   const taggedPosts = await postCollection.find({ tags: tag }).toArray();
 
-  return taggedPosts.map(post => {
-    post._id = post._id.toString();
-    return post;
-  });
-};
+//   return taggedPosts.map(post => {
+//     post._id = post._id.toString();
+//     return post;
+//   });
+// };
 
 // Function to get user by comment ID
 export const getUserByCommentId = async (commentId) => {
