@@ -12,7 +12,7 @@ const constructorMethod = (app) => {
   });
   app.use('/public', staticDir('public'));
   app.use('*', (req, res) => {
-    res.redirect('/posts');
+    res.redirect('/');
   });
 };
 
