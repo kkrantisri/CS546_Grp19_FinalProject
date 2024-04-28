@@ -59,8 +59,6 @@ router
       const newPost = await postData.createPost(title,content,userId,tags);
       res.redirect(`/posts/${newPost._id}`);
     }catch(e){
-      res.status
+      res.status(500).render('error',{message : e})
     }
-
-
   })
