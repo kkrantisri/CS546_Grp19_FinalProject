@@ -1,4 +1,4 @@
-import {ObjectId} from 'mongodb';
+import { ObjectId } from 'mongodb';
 
 
 const exportedMethods = {
@@ -34,6 +34,22 @@ const exportedMethods = {
     }
 
     return arr;
+  },
+  checkEmail(email) {
+    const emailRegex = /^[a-zA-Z]+@stevens\.edu$/;
+    if (!emailRegex.test(email)) {
+      throw new Error('Invalid email address. Email must be in the format username@stevens.edu and contain only alphabetic characters before @.');
+    }
+    email = email.toLowerCase();
+
+    return email;
+  },
+  checkRating(rating) {
+    const parsedRating = parseFloat(rating);
+    if (isNaN(parsedRating) || parsedRating < 1 || parsedRating > 5) {
+      throw new Error('Invalid rating. Rating must be a number between 1 and 5.');
+    }
+    return parsedRating;
   }
 };
 export default exportedMethods;
