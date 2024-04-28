@@ -60,27 +60,22 @@ export const createPost = async (title, content, userId, tags,course) => {
 };
 export const updatePost = async (id,updatedPost) => {
     const updatedPostData = {};
-    
-
-    
-    if (updatedPost.tags) {
+    if (updatedPost.hasOwnProperty("tags")) {
       updatedPostData.tags = validation.checkStringArray(
         updatedPost.tags,
         'Tags'
       );
     }
-
-    if (updatedPost.title) {
+    if (updatedPost.hasOwnProperty("title")) {
       updatedPostData.title = validation.checkString(
         updatedPost.title,
         'Title'
       );
     }
-
-    if (updatedPost.content) {
+    if (updatedPost.hasOwnProperty("content")) {
       updatedPostData.content = validation.checkString(updatedPost.content, 'content');
     }
-    if (updatedPost.course) {
+    if (updatedPost.hasOwnProperty("course")) {
       updatedPostData.course = validation.checkString(updatedPost.course, 'course');
     }
     updatedPostData.last_updated_at = new Date().toUTCString()

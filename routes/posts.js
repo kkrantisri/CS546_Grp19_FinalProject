@@ -62,3 +62,44 @@ router
       res.status(500).render('error',{message : e})
     }
   })
+
+  router
+  .route('/:id')
+  .get(async (req, res) => {
+    const postId = req.params.id
+    try {
+      const validPostId = helpers.checkId(postId , 'postId');
+      const postList = await postData.getPostById(validPostId);
+      if(!postList){
+        throw 'Error : Post Not Found'
+      }
+      res.render('posts/postDetails', {postList});
+    } catch (e) {
+      res.status(404).json({error: e});
+    }
+  })
+  .patch(async (req, res) =>{
+    const postId = req.params.id;
+    const updatedPostData = req.body;
+    try{
+      const validPostId = helpers.checkId(postId , 'postId');
+      const existingPost = await postData.getPostById(validPostId);
+      if(!existingPost){
+        throw `Post with ID ${validPostId} not found` 
+      }
+      const validFields = ['title' , 'content' , 'course' , 'tags'];
+      const updatedPost = Object.keys(updatedPostData).filter(i => validFields.includes(i));
+      if(!updatedPost){
+        throw 'Error : atleast one field should exist to update'
+      }
+
+      const updatedField = await postData.updatePost(validPostId,updatedPost);
+      res.render('editPost', {message : 'Sucessfully updated the post !!'})
+    }catch(e){
+      res.status(400).render('error',{message : e})
+    }
+    
+  })
+  .delete(async (req, res) =>{
+    
+  })
