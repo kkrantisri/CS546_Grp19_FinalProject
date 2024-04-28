@@ -10,6 +10,9 @@ const constructorMethod = (app) => {
   app.get('/about', (req, res) => {
     res.sendFile(path.resolve('static/about.html'));
   });
+  app.get('/contact', (req, res) => {
+    res.sendFile(path.resolve('static/contact.html'));
+  });
   app.use('/public', staticDir('public'));
   app.use('*', (req, res) => {
     res.redirect('/');

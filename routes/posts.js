@@ -170,7 +170,7 @@ router
       }
       const postLis = await postData.updateLikes(validPostId);
       if(postLis.updateLikes === true){
-        res.render('postDetails', {likes : postLis.likes});
+        res.render('posts/postDetails', {likes : postLis.likes});
       }
      
     } catch (e) {
@@ -189,7 +189,7 @@ router
       }
       const postLis = await postData.updateDislikes(postID);
       if(postLis.updateDislikes === true){
-        res.render('postDetails', {dislikes : postLis.dislikes});
+        res.render('posts/postDetails', {dislikes : postLis.dislikes});
       }
     } catch (e) {
       res.status(400).json({error: e});
