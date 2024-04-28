@@ -132,7 +132,7 @@ export const createComment = async (postId,userId,userName,content) =>{
   if(!updateInfo){
     throw `Error: Update failed! Could not add the review for the product with productId ${postId}`;
   }
-  return updateInfo;
+  return {commentCompleted : true};
 
 };
 export const getAllComments = async (postId) =>{
@@ -191,8 +191,9 @@ export const updateLikes = async(postId)=>{
   {returnDocument: 'after'});
   if (newPost.lastErrorObject.n === 0)
       throw [404, `Could not update the post with id ${postId}`];
+  var count = newPost.value.likes;
 
-  return newPost.value;
+  return {updateLikes : true , likes : count};
 };
 export const updateDislikes = async(postId)=>{
   postId = helpers.checkId(postId,'postId')
@@ -202,8 +203,9 @@ export const updateDislikes = async(postId)=>{
   {returnDocument: 'after'});
   if (newPost.lastErrorObject.n === 0)
       throw [404, `Could not update the post with id ${postId}`];
+  var count = newPost.value.dislikes;
 
-  return newPost.value;
+  return {updateDislikes : true , dislikes : count};
 };
 
 
