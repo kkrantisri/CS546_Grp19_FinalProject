@@ -3,11 +3,18 @@
   "version": "1.0.0",
   "description": "CS 546 Web Group 19 ",
   "main": "app.js",
+
+  "type":"module",
+
+
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
     "seed": "node ./tasks/seed.js"
   },
+
+ 
+
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kkrantisri/CS546_Grp19_FinalProject"
@@ -27,5 +34,6 @@
     "handlebars": "^4.7.8",
     "mongodb": "^3.7.4",
     "xss": "^1.0.15"
+
   }
 }

@@ -50,6 +50,55 @@ const exportedMethods = {
       throw new Error('Invalid rating. Rating must be a number between 1 and 5.');
     }
     return parsedRating;
-  }
+  },
+  isValidDate(dateString) {
+  
+    var regex = /^(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])\/\d{4}$/;
+    if (!regex.test(dateString)) {
+        return false;
+    }
+    
+    var dateParts = dateString.split('/');
+    var month = parseInt(dateParts[0], 10);
+    var day = parseInt(dateParts[1], 10);
+    var year = parseInt(dateParts[2], 10);
+    var date = new Date(year, month - 1, day);
+    if(day===29 && month===2){
+      return false;
+    }
+    var currentdate = new Date();
+
+    if(date < currentdate)
+    {
+    
+       return false;
+    }
+    return (
+        date.getFullYear() === year &&
+        date.getMonth() === month - 1 &&
+        date.getDate() === day
+    );
+  },
+  isTimeSlotValid(selectedTimeSlot) {
+    
+    var selectedStartTime = selectedTimeSlot.split(" - ")[0];
+    var selectedEndTime = selectedTimeSlot.split(" - ")[1];
+
+    
+    var currentDate = new Date();
+    var currentHour = currentDate.getHours();
+    var currentMinutes = currentDate.getMinutes();
+
+    
+    var currentTime = currentHour + ":" + currentMinutes;
+    
+    
+    if (selectedStartTime > currentTime) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 };
 export default exportedMethods;

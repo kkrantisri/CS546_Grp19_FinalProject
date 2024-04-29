@@ -21,7 +21,7 @@ export const getAllPosts = async () => {
 export const getPostsByTag = async (tag)=>{
   tag = helpers.checkString(tag,'Tag')
   const postCollection = await posts();
-    return await postCollection.find({tags: tag}).toArray();
+  return await postCollection.find({tags: tag}).toArray();
 };
 // Function to create a new post
 export const createPost = async (title, content, userId, tags,course) => {
@@ -51,38 +51,31 @@ export const createPost = async (title, content, userId, tags,course) => {
   const insertInfo = await postCollection.insertOne(newPost);
 
   if (!insertInfo.acknowledged || !insertInfo.insertedId) {
-    throw new Error('Could not create post');
+    throw 'Could not create post';
   }
 
   const postId = insertInfo.insertedId.toString();
   const createdPost = await getPostById(postId);
   return createdPost;
 };
-
-// Function to update post
 export const updatePost = async (id,updatedPost) => {
     const updatedPostData = {};
-    
-
-    
-    if (updatedPost.tags) {
+    if (updatedPost.hasOwnProperty("tags")) {
       updatedPostData.tags = validation.checkStringArray(
         updatedPost.tags,
         'Tags'
       );
     }
-
-    if (updatedPost.title) {
+    if (updatedPost.hasOwnProperty("title")) {
       updatedPostData.title = validation.checkString(
         updatedPost.title,
         'Title'
       );
     }
-
-    if (updatedPost.content) {
+    if (updatedPost.hasOwnProperty("content")) {
       updatedPostData.content = validation.checkString(updatedPost.content, 'content');
     }
-    if (updatedPost.course) {
+    if (updatedPost.hasOwnProperty("course")) {
       updatedPostData.course = validation.checkString(updatedPost.course, 'course');
     }
     updatedPostData.last_updated_at = new Date().toUTCString()
@@ -137,9 +130,9 @@ export const createComment = async (postId,userId,userName,content) =>{
   }
   const updateInfo = await postCollection.updateOne({_id: new ObjectId(postId)}, {$push: {comments: newReview}},{returnDocument:'after'});
   if(!updateInfo){
-    throw `Error: Update failed! Could not add the review for the product with productId ${postId}`;
+    throw `Error: Update failed! Could not add the comment for the post with postId ${postId}`;
   }
-  return updateInfo;
+  return {commentCompleted : true};
 
 };
 export const getAllComments = async (postId) =>{
@@ -198,8 +191,9 @@ export const updateLikes = async(postId)=>{
   {returnDocument: 'after'});
   if (newPost.lastErrorObject.n === 0)
       throw [404, `Could not update the post with id ${postId}`];
+  var count = newPost.value.likes;
 
-  return newPost.value;
+  return {updateLikes : true , likes : count};
 };
 export const updateDislikes = async(postId)=>{
   postId = helpers.checkId(postId,'postId')
@@ -209,8 +203,9 @@ export const updateDislikes = async(postId)=>{
   {returnDocument: 'after'});
   if (newPost.lastErrorObject.n === 0)
       throw [404, `Could not update the post with id ${postId}`];
+  var count = newPost.value.dislikes;
 
-  return newPost.value;
+  return {updateDislikes : true , dislikes : count};
 };
 
 
