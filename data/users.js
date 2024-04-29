@@ -1,6 +1,7 @@
 import { users } from "../config/mongoCollections.js";
 import { ObjectId } from 'mongodb';
 import { checkId, checkString, checkStringArray, checkEmail, checkRating } from '../helper.js';
+import { helpers } from "handlebars";
 
 const userCollection = await users();
 const saltRounds = 16;
@@ -202,7 +203,16 @@ export const updateUser = async (userId, updatedUserData) => {
   return await this.getUserById(validatedUserId);
 };
 
+export const getCoursesbyUserName = async (username) =>{
+  username = checkString(username,'username')
+  const userCheck = await userCollection.findOne({username:username});
+  if(userCheck===null){
+    throw 'No user found with that username'
+  }
+  const coursesObj = await userCollection.findOne({username:username},{_id:0,coursesEnrolled:1});
+  return coursesObj.coursesEnrolled;
 
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // OPTIONAL

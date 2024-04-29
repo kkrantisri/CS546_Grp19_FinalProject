@@ -45,6 +45,9 @@ export const createSession = async (course,content,senderName,receiverName,date,
   if(sender === null) throw 'No sender with that userName'
   const receiver = await userCollection.findOne({username :receiverName});
   if(receiver===null) throw 'No receiver with that userName'
+  if(senderName===receiverName){
+    throw "You cannot Schedule a session with yourself!!"
+  }
   const sessionCollection = await sessions();
   const checksendertimeslots = await sessionCollection.findOne({$and:[{senderName : senderName},{date : date},{timeSlot:timeSlot}]});
   if(checksendertimeslots!==null){
@@ -52,7 +55,7 @@ export const createSession = async (course,content,senderName,receiverName,date,
   }
   const checkereceivertimeslots  = await sessionCollection.findOne({$and:[{receiverName : receiverName},{date : date},{timeSlot:timeSlot},{status :"accepted"}]});
   if(checkereceivertimeslots!==null){
-    throw 'Receipent was already occupied with other study session please book other session'
+    throw 'Recipient was already occupied with other study session please book other session'
   }
   const newSession = {
     course : course,
