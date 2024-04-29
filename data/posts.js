@@ -21,7 +21,7 @@ export const getAllPosts = async () => {
 export const getPostsByTag = async (tag)=>{
   tag = helpers.checkString(tag,'Tag')
   const postCollection = await posts();
-    return await postCollection.find({tags: tag}).toArray();
+  return await postCollection.find({tags: tag}).toArray();
 };
 // Function to create a new post
 export const createPost = async (title, content, userId, tags,course) => {
@@ -137,7 +137,7 @@ export const createComment = async (postId,userId,userName,content) =>{
   }
   const updateInfo = await postCollection.updateOne({_id: new ObjectId(postId)}, {$push: {comments: newReview}},{returnDocument:'after'});
   if(!updateInfo){
-    throw `Error: Update failed! Could not add the review for the product with productId ${postId}`;
+    throw `Error: Update failed! Could not add the comment for the post with postId ${postId}`;
   }
   return updateInfo;
 
