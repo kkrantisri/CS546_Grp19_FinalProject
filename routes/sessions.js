@@ -76,9 +76,13 @@ router.route('/').post(async(req,res)=>{
   try{
     const {course,content,date,timeSlot,receiverName} = sessionFormData;
     //const senderName = req.session.user.username;
-    const check = await sessionData.createSession(course,content,senderName,receiverName,date,timeSlot);
-    res.redirect(`/sessions/${senderName}/sent`);
-    return;
+    const succ = await sessionData.createSession(course,content,senderName,receiverName,date,timeSlot);
+    if(succ.sessionCreated){
+    res.redirect(`/sessions/${senderName}/sent`);}
+    else{
+      res.status(500).json({error:"Internal Server Error"});
+    }
+    
   }catch(e){
     //const userId = req.session.user.userId
     //const coursesList = await userData.getCoursesbyUserId(userId);
@@ -93,14 +97,14 @@ router.route('/:username/sent').get(async(req,res)=>{
   try {
     req.params.username = helpers.checkString(req.params.username,'username URL Param')
   } catch (e) {
-    res.status(400).render('sessions/errors',{error:e,hasuserNameErrors:true});
+    res.status(400).render('sessions/errors',{error:e,has400Errors:true});
     return;
   }
   try {
     const sentReqList = await sessionData.getAllSentSessions(req.params.username);
     res.render('sessions/sentreq',{sentReqList:sentReqList});
   } catch (e) {
-    res.status(404).render('sessions/errors',{error:e,hasuserNotFoundErrors:true});
+    res.status(404).render('sessions/errors',{error:e,has404FoundErrors:true});
     return;
   }
 });
@@ -108,16 +112,60 @@ router.route('/:username/received').get(async(req,res)=>{
   try {
     req.params.username = helpers.checkString(req.params.username,'username URL Param')
   } catch (e) {
-    res.status(400).render('sessions/errors',{error:e,hasuserNameErrors:true});
+    res.status(400).render('sessions/errors',{error:e,has400Errors:true});
     return;
   }
   try {
     const receivedReqList = await sessionData.getAllReceivedSessions(req.params.username);
     res.render('sessions/receivedreq',{sentReqList:sentReqList});
   } catch (e) {
-    res.status(404).render('sessions/errors',{error:e,hasuserNotFoundErrors:true});
+    res.status(404).render('sessions/errors',{error:e,has404FoundErrors:true});
     return;
   }
 });
+router.route('/:username/received/:sessionId').patch(async(req,res)=>{
+  const status = req.body.action;
+  const username = req.params.username;
+  const sessionId = req.params.sessionId;
+  let errors = []
+  try{
+    status = helpers.checkString(status,'status');
+  }catch(e){
+    errors.push(e)
+  }
+  try {
+    username = helpers.checkString(username,'username');
+  } catch (e) {
+    errors.push(e)
+  }
+  try {
+    sessionId = helpers.checkId(sessionId,'sessionId')
+  } catch (e) {
+    errors.push(e)
+  }
+  try{
+    if(status!=="accepted"&&status!=="rejected"){
+      throw 'Status should be either accepted or rejected'
+    }
+  }catch(e){
+    errors.push(e);
+  }
+  if(errors.length>0){
+    res.status(400).render('sessions/errors',{errors:errors},{has400Errors : true});
+  }
+  try {
+    const succ = await sessionData.updateSessionPatch(sessionId,username,status);
+    if(succ.sessionUpdated){
+    res.redirect(`/sessions/${username}/received`);}
+    else{
+      res.status(500).json({error:"Internal Server Error"});
+    }
+  } catch (e) {
+    res.status(404).render('sessions/errors',{errors:e},{has404FoundErrors:true});
+    return;
+  }
+});
+
+export default router
 
 

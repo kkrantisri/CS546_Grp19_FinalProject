@@ -70,9 +70,8 @@ export const createSession = async (course,content,senderName,receiverName,date,
   if (!insertInfo.acknowledged || !insertInfo.insertedId){
         throw 'Could not add session';}
   
-  const newId = insertInfo.insertedId;
-  const session = await sessionCollection.findOne({_id:newId});
-  return session;
+  const succ = {sessionCreated : true}
+  return succ;
 };
 
 export const updateSessionPatch=async(sessionId,username,status) =>{
@@ -94,8 +93,10 @@ export const updateSessionPatch=async(sessionId,username,status) =>{
   if(!updatedSession){
     throw 'Session not updated';
   }
-  const updatedReceivedSessions = await sessionCollection.find({$and:[{receiverName : username },{status: { $in: ['accepted', 'pending'], $ne: 'rejected' }}]}).toArray();
-  return updatedReceivedSessions;
+  const succ = {sessionUpdated : true}
+  return succ;
+  // const updatedReceivedSessions = await sessionCollection.find({$and:[{receiverName : username },{status: { $in: ['accepted', 'pending'], $ne: 'rejected' }}]}).toArray();
+  // return updatedReceivedSessions;
 }
 
 // Function to update session details
