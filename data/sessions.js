@@ -37,7 +37,7 @@ export const createSession = async (course,content,senderName,receiverName,date,
     throw "Please enter valid Date in mm/dd/yyyy and Date cannot be Past Date"
   }
   timeSlot = helpers.checkString(timeSlot,'timeSlot')
-  if(!helpers.isTimeSlotValid(timeSlot)){
+  if(!helpers.isTimeSlotValid(timeSlot,date)){
     throw "Please select valid time slot and time slot cannot be in Past"
   }
   const userCollection = await users();

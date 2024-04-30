@@ -80,5 +80,32 @@ $(document).ready(function() {
             login_form[0].submit();
         }
     });
+    $('.accept-button').click(async function() {
+        const sessionId = $(this).attr('data-session-id');
+        const username = $(this).attr('data-user-name');
+    
+        try {
+          const response = await axios.patch(`/sessions/${username}/received/${sessionId}`, {
+            action: 'accepted'
+          });
+        } catch (error) {
+          console.error('Error occurred:', error);
+          
+        }
+      });
+    
+      // Reject button click event listener
+      $('.reject-button').click(async function() {
+        const sessionId = $(this).attr('data-session-id');
+        const username = $(this).attr('data-user-name');
+    
+        try {
+          const response = await axios.patch(`/sessions/${username}/received/${sessionId}`, {
+            action: 'rejected'
+          });
+        } catch (error) {
+          console.error('Error occurred:', error);
+        }
+      });
   });
   

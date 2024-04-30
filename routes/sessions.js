@@ -43,7 +43,7 @@ router.route('/').post(async(req,res)=>{
     errors.push(error);
   }
   try{
-    if(!helpers.isTimeSlotValid(sessionFormData.timeSlot)){
+    if(!helpers.isTimeSlotValid(sessionFormData.timeSlot,sessionFormData.date)){
       throw "Please select valid time slot and time slot cannot be in Past"
     }
   }catch(error){
@@ -60,7 +60,7 @@ router.route('/').post(async(req,res)=>{
     errors.push(error)
   }
   try{
-    if(senderName===sessionData.receiverName){
+    if(senderName===sessionFormData.receiverName){
       throw "You cannot Schedule a session with yourself!!"
     }
   }catch(e){
@@ -70,7 +70,7 @@ router.route('/').post(async(req,res)=>{
     //const userId = req.session.user.userId
     //const coursesList = await userData.getCoursesbyUserId(userId);
     //const userList = await userData.getAllUsers();
-    res.status(400).render('sessions/createSession',{users : userList,courses : coursesList,errors : errors,hasErrors:true});
+    res.status(400).render('sessions/createSession',{users : userList,courses : coursesList,sessions:sessionFormData,errors : errors,hasErrors:true});
     return;
   }
   try{
@@ -87,7 +87,7 @@ router.route('/').post(async(req,res)=>{
     //const userId = req.session.user.userId
     //const coursesList = await userData.getCoursesbyUserId(userId);
     //const userList = await userData.getAllUsers();
-    res.status(400).render('sessions/createSession',{users : userList,courses : coursesList,errors : e,hasErrors:true});
+    res.status(400).render('sessions/createSession',{users : userList,courses : coursesList,sessions:sessionFormData,errors : e,hasErrors:true});
     return;
     
   }
@@ -117,7 +117,7 @@ router.route('/:username/received').get(async(req,res)=>{
   }
   try {
     const receivedReqList = await sessionData.getAllReceivedSessions(req.params.username);
-    res.render('sessions/receivedreq',{sentReqList:sentReqList});
+    res.render('sessions/receivedreq',{receivedReqList:receivedReqList});
   } catch (e) {
     res.status(404).render('sessions/errors',{error:e,has404FoundErrors:true});
     return;
