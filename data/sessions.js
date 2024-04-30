@@ -1,9 +1,21 @@
 import { sessions,users } from "../config/mongoCollections.js";
 import { ObjectId, ReturnDocument } from 'mongodb';
 import helpers from '../helper.js'
-// Function to get a session by its ID
+
+async function updatePendingSessions() {
+  const sessionCollection = await sessions();
+  const pendingSessions = await sessionCollection.find({ 
+    status: "pending"}).toArray();
+
+  for (const session of pendingSessions) {
+    if(!helpers.isTimeSlotValid(session.timeSlot,session.date))
+    await sessionCollection.updateOne({ _id: session._id }, { $set: { status: "noResponse" } });
+  }
+}
+
 export const getAllReceivedSessions = async (username) => {
   username = helpers.checkString(username,'username');
+  await updatePendingSessions();
   const userCollection = await users()
   userFound = await userCollection.findOne({username:username});
   if(!userFound){
@@ -11,11 +23,12 @@ export const getAllReceivedSessions = async (username) => {
   }
 
   const sessionCollection = await sessions();
-  const receivedSessions = await sessionCollection.find({$and:[{receiverName : username },{status: { $in: ['accepted', 'pending'], $ne: 'rejected' }}]}).toArray();
+  const receivedSessions = await sessionCollection.find({$and:[{receiverName : username },{status: { $in: ['accepted', 'pending'], $ne: ['rejected','noResponse'] }}]}).toArray();
   return receivedSessions;
 };
 export const getAllSentSessions = async(username) =>{
   username = helpers.checkString(username,'username');
+  await updatePendingSessions();
   const userCollection = await users()
   userFound = await userCollection.findOne({username:username});
   if(!userFound){
