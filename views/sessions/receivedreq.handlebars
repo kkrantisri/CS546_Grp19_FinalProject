@@ -5,7 +5,7 @@
       <h2>{{course}}</h2>
       <p>{{content}}</p>
       <p>Received request from {{senderName}} to schedule a session on {{date}} during {{timeSlot}}</p>
-      <p>Current Status is {{status}}</p>
+      <p class = "status">Current Status is {{status}}</p>
       {{#if status "===" "pending"}}
         <button class="accept-button" data-session-id="{{_id}}" data-user-name="{{receiverName}}">Accept</button>
         <button class="reject-button" data-session-id="{{_id}}" data-user-name="{{receiverName}}">Reject</button>

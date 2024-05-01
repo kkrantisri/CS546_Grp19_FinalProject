@@ -156,7 +156,9 @@ router.route('/:username/received/:sessionId').patch(async(req,res)=>{
   try {
     const succ = await sessionData.updateSessionPatch(sessionId,username,status);
     if(succ.sessionUpdated){
-    res.redirect(`/sessions/${username}/received`);}
+      res.json({status:succ.status});
+    }
+      
     else{
       res.status(500).json({error:"Internal Server Error"});
     }

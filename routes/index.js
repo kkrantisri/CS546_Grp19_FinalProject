@@ -1,20 +1,3 @@
-<<<<<<< HEAD
-
-import express from 'express';
-const router = express.Router();
-const app = express();
-
-  app.use("/posts", postRoutes);
-  app.use("/sessions", sessionRoutes);
-  app.use("/users", userRoutes);
-
-  app.use("*", (req, res) => {
-    res.status(404).json({error: 'Route Not found'});
-  });
-
-
-export default router;
-=======
 import postRoutes from './posts.js';
 import userRoutes from './users.js';
 import sessionRoutes from'./sessions.js';
@@ -37,4 +20,3 @@ const constructorMethod = (app) => {
 };
 
 export default constructorMethod;
->>>>>>> 0836344c62ff98b224f58093e9c26c69a5629e69
