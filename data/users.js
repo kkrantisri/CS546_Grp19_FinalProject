@@ -25,10 +25,8 @@ export const addUser = async (userData) => {
     !bio ||
     !gradYear
   ) {
-    throw new Error('Invalid user data');
+    throw 'Invalid user data';
   }
-
-  // Validations
   let validatedUsername = checkString(username, 'username');
   const validatedPassword = checkString(password, 'password');
   let validatedEmail = checkString(email, 'email');
@@ -74,21 +72,16 @@ export const addUser = async (userData) => {
     coursesEnrolled: validatedCoursesEnrolled,
     bio: validatedBio,
     gradYear: gradYear,
-    posts: posts || [],
-    reviews: reviews || []
+    reviews: []
   };
-
-  // Insert new user into the DB
   const insertInfo = await userCollection.insertOne(newUserObj);
   if (!insertInfo.acknowledged || !insertInfo.insertedId || insertInfo.insertedCount === 0) throw 'Could not add user!';
-
-  // Return the newly added user
   const newId = insertInfo.insertedId.toString();
   const createdUser = await getUserById(newId);
-
-  //return insertInfo.value;
   return createdUser;
 };
+
+
 
 
 // 2. Get a user by their ID
@@ -134,75 +127,62 @@ export const getAllUsers = async () => {
 // 6. Update user data
 export const updateUser = async (userId, updatedUserData) => {
   const validatedUserId = checkId(userId, 'userId');
-
-  // if(!updatedUserData) {
-  //   return await this.getUserById(id);
-  // }
-
   if (!updatedUserData || typeof updatedUserData !== 'object' || Array.isArray(updatedUserData)) {
     throw new Error('Invalid or missing updated user data.');
   }
 
-  if (typeof userId === 'string') {
-    userId = ObjectId.createFromHexString(validatedUserId);
+  const currentUser = await userCollection.findOne({ _id: validatedUserId });
+  if (!currentUser) {
+    throw new Error('User not found with the given id.');
   }
 
-  let updatedUserData = {};
-
-  const currentUser = await this.getUserById(validatedUserId);
-
-  // return if no updates are provided
-  if (Object.keys(updatedUserData).length === 0) {
-    return currentUser;
-  }
-
-  if (updatedUserData.firstName) {
-    updatedData.firstName = checkString(updatedUserData.firstName, 'First Name');
-  }
-
-  if (updatedUserData.lastName) {
-    updatedData.lastName = checkString(updatedUserData.lastName, 'Last Name');
-  }
-
-  if (updatedUserData.email) {
-    updatedData.email = checkEmail(updatedUserData.email);
-  }
-
-  if (updatedUserData.passwordHash) {
-    updatedData.passwordHash = updatedUserData.passwordHash;
-  }
-
-  if (updatedUserData.city) {
-    updatedData.city = checkString(updatedUserData.city, 'City');
-  }
-
-  if (updatedUserData.state) {
-    updatedData.state = checkString(updatedUserData.state, 'State');
-  }
-
-  if (updatedUserData.age) {
-    const age = Number(updatedUserData.age);
-    if (isNaN(age) || age < 0 || age > 100) {
-      throw new Error('Invalid age. Age must be a non-negative number and less than 100');
+  const { username, password, email, fullName, major, languages, coursesEnrolled, bio, gradYear } = updatedUserData;
+  if (updatedUserData.hasOwnProperty("username")) {
+    const validatedUsername = checkString(username, 'username');
+    const existingUserWithUsername = await userCollection.findOne({ username: validatedUsername.toLowerCase() });
+    if (existingUserWithUsername && existingUserWithUsername._id.toString() !== validatedUserId) {
+      throw 'This username is already taken.';
     }
-    updatedData.age = age;
   }
-
-  // if no valid updates were provided
-  if (Object.keys(updatedData).length === 0) {
-    return await this.getUser(validatedId);
+  if (updatedUserData.hasOwnProperty("email")) {
+    const validatedEmail = checkString(email, 'email');
+    const existingUserWithEmail = await userCollection.findOne({ email: validatedEmail.toLowerCase() });
+    if (existingUserWithEmail && existingUserWithEmail._id.toString() !== validatedUserId) {
+      throw 'This email is already taken.'
+    }
   }
-
-  const updatedInfo = await userCollection.findOneAndUpdate({ _id: ObjectId(validatedUserId) }, { $set: updatedData }, { returnDocument: 'after' });
-
+  if (updatedUserData.hasOwnProperty("password")) {
+    const isPasswordMatch = await bcrypt.compare(password, currentUser.password);
+    if (isPasswordMatch) {
+      throw 'Provided password matches with old password.'
+    }
+  }
+  const fieldsToUpdate = ["fullName", "major", "languages", "coursesEnrolled", "bio", "gradYear"];
+  fieldsToUpdate.forEach(field => {
+    if (updatedUserData.hasOwnProperty(field) && updatedUserData[field] !== currentUser[field]) {
+      if (field === 'languages' || field === 'coursesEnrolled') {
+        checkStringArray(updatedUserData[field], field);
+      } else {
+        checkString(updatedUserData[field], field);
+      }
+    }
+  });
+  let updatedData = {};
+  fieldsToUpdate.forEach(field => {
+    if (updatedUserData.hasOwnProperty(field) && updatedUserData[field] !== currentUser[field]) {
+      updatedData[field] = updatedUserData[field];
+    }
+  });
+  const updatedInfo = await userCollection.findOneAndUpdate(
+    { _id: validatedUserId },
+    { $set: updatedData },
+    { returnDocument: 'after' }
+  );
   if (updatedInfo.modifiedCount === 0) {
-    throw new Error('Could not update user!');
+    throw 'Could not update user!';
   }
-
-  //return updatedInfo.value;
-  return await this.getUserById(validatedUserId);
+  return { updateUser: true };
 };
-
 export const getCoursesbyUserName = async (username) =>{
   username = checkString(username,'username')
   const userCheck = await userCollection.findOne({username:username});
@@ -211,6 +191,9 @@ export const getCoursesbyUserName = async (username) =>{
   }
   const coursesObj = await userCollection.findOne({username:username},{_id:0,coursesEnrolled:1});
   return coursesObj.coursesEnrolled;
+
+}
+export const createreviewbyuserid = async() => {
 
 }
 
