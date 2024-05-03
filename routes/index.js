@@ -1,9 +1,11 @@
 import postRoutes from './posts.js';
 import userRoutes from './users.js';
 import sessionRoutes from'./sessions.js';
+import authRoutes from './auth.js'
 import path from 'path';
 import {static as staticDir} from 'express';
 const constructorMethod = (app) => {
+  app.use('/', authRoutes);
   app.use('/posts', postRoutes);
   app.use('/sessions', sessionRoutes);
   app.use('/users', userRoutes);
