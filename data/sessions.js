@@ -23,7 +23,7 @@ export const getAllReceivedSessions = async (username) => {
   }
 
   const sessionCollection = await sessions();
-  const receivedSessions = await sessionCollection.find({$and:[{receiverName : username },{status: { $in: ['accepted', 'pending'], $ne: ['rejected','noResponse'] }}]}).toArray();
+  const receivedSessions = await sessionCollection.find({$and:[{receiverName : username },{status: { $in: ['accepted', 'pending'], $nin: ['rejected','noResponse'] }}]}).toArray();
   return receivedSessions;
 };
 export const getAllSentSessions = async(username) =>{
@@ -106,7 +106,7 @@ export const updateSessionPatch=async(sessionId,username,status) =>{
   if(!updatedSession){
     throw 'Session not updated';
   }
-  const succ = {sessionUpdated : true}
+  const succ = {sessionUpdated : true,status:updatedSession.status}
   return succ;
   // const updatedReceivedSessions = await sessionCollection.find({$and:[{receiverName : username },{status: { $in: ['accepted', 'pending'], $ne: 'rejected' }}]}).toArray();
   // return updatedReceivedSessions;

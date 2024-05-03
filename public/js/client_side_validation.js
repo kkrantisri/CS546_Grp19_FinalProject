@@ -88,6 +88,10 @@ $(document).ready(function() {
           const response = await axios.patch(`/sessions/${username}/received/${sessionId}`, {
             action: 'accepted'
           });
+            const sessionArticle = $(this).closest('.session');
+            sessionArticle.removeClass('session-pending').addClass('session-accepted');
+            sessionArticle.find('.accept-button, .reject-button').hide();
+            sessionArticle.find('.status').text(`Current Status is ${response.data.status}`);
         } catch (error) {
           console.error('Error occurred:', error);
           
@@ -103,6 +107,10 @@ $(document).ready(function() {
           const response = await axios.patch(`/sessions/${username}/received/${sessionId}`, {
             action: 'rejected'
           });
+          const sessionArticle = $(this).closest('.session');
+          sessionArticle.removeClass('session-pending').addClass('session-accepted');
+          sessionArticle.find('.accept-button, .reject-button').hide();
+          sessionArticle.find('.status').text(`Current Status is ${response.data.status}`);
         } catch (error) {
           console.error('Error occurred:', error);
         }
