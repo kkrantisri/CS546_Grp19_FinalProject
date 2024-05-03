@@ -193,7 +193,27 @@ export const getCoursesbyUserName = async (username) =>{
   return coursesObj.coursesEnrolled;
 
 }
-export const createreviewbyuserid = async() => {
+export const createreviewbyuserid = async(userId , reviewId , review , rating) => {
+  const validatedUserId = checkId(userId);
+  const validatedReviewerId = checkId(reviewId);
+  const reviewerUsername = await getUsernameById(validatedReviewerId);
+  const user = await userCollection.findOne({_id : validatedUserId});
+  if(!user){
+    throw 'Error : User not found'
+  }
+  user.review.push({
+    reviewId : validatedReviewerId,
+    reviewerUsername: reviewerUsername,
+    review : review,
+    rating : rating
+  });
+
+  await userCollection.updateOne(
+    { _id: ObjectId(validatedUserId) },
+    { $set: { reviews: user.reviews } }
+  );
+  return user;
+
 
 }
 
