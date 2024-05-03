@@ -1,0 +1,175 @@
+import { posts, users } from "../config/mongoCollections.js";
+import { ObjectId } from 'mongodb';
+import * as userData from './users.js'
+import helpers from '../helper.js'
+// Function to get a post by its ID
+export const getPostById = async (id) => {
+  id = helpers.checkId(id);
+  const postCollection = await posts();
+  const post = await postCollection.findOne({ _id: new ObjectId(id) });
+  if (!post) {
+    throw 'Error: Post not found';
+  }
+  //post._id = post._id.toString();
+  return post;
+};
+// Function to get all posts
+export const getAllPosts = async () => {
+  const postCollection = await posts();
+  return await postCollection.find({}).toArray();
+};
+export const getPostsByTag = async (tag)=>{
+  tag = helpers.checkString(tag,'Tag')
+  const postCollection = await posts();
+    return await postCollection.find({tags: tag}).toArray();
+};
+// Function to create a new post
+export const createPost = async (title, content, userId, tags,course) => {
+  title = helpers.checkString(title, 'Title');
+  content = helpers.checkString(content,'content');
+  course = helpers.checkString(course,'course')
+  userId = validation.checkId(userId, 'User ID');
+  if (!Array.isArray(tags)) {
+    tags = [];
+  } else {
+    tags = validation.checkStringArray(tags, 'Tags');
+  }
+  //const userThatPosted = await userData.getUserById(userId);
+  const last_updated_at = new Date().toUTCString()
+  const newPost = {
+    title : title,
+    content :content,
+    userId: userId,
+    course : course,
+    tags: tags,
+    last_updated_at : last_updated_at,
+    likes: 0,
+    dislikes: 0,
+    comments: []
+  };
+  const postCollection = await posts();
+  const insertInfo = await postCollection.insertOne(newPost);
+
+  if (!insertInfo.acknowledged || !insertInfo.insertedId) {
+    throw new Error('Could not create post');
+  }
+
+  const postId = insertInfo.insertedId.toString();
+  const createdPost = await getPostById(postId);
+  return createdPost;
+};
+
+// Function to update post
+export const updatePost = async (id,updatedPost) => {
+    const updatedPostData = {};
+    
+
+    
+    if (updatedPost.tags) {
+      updatedPostData.tags = validation.checkStringArray(
+        updatedPost.tags,
+        'Tags'
+      );
+    }
+
+    if (updatedPost.title) {
+      updatedPostData.title = validation.checkString(
+        updatedPost.title,
+        'Title'
+      );
+    }
+
+    if (updatedPost.content) {
+      updatedPostData.content = validation.checkString(updatedPost.content, 'content');
+    }
+    if (updatedPost.course) {
+      updatedPostData.course = validation.checkString(updatedPost.course, 'course');
+    }
+    updatedPostData.last_updated_at = new Date().toUTCString()
+    const postCollection = await posts();
+    let newPost = await postCollection.findOneAndUpdate(
+      {_id: new ObjectId(id)},
+      {$set: updatedPostData},
+      {returnDocument: 'after'}
+    );
+    if (newPost.lastErrorObject.n === 0)
+      throw [404, `Could not update the post with id ${id}`];
+
+    return newPost.value;
+  
+};
+
+// Function to delete a post
+export const deletePost = async (id) => {
+  id = validation.checkId(id);
+
+  const postCollection = await posts();
+  const deletionInfo = await postCollection.findOneAndDelete({ _id: new ObjectId(postId) });
+
+  if (deletionInfo.lastErrorObject.n === 0)
+      throw [404, `Could not delete post with id of ${id}`];
+
+  return {...deletionInfo.value, deleted: true};
+};
+export const createComment = async (postId,userId,userName,content) =>{
+  postId = helpers.checkId(postId,'postId')
+  userId = helpers.checkId(userId,'userId')
+  userName = helpers.checkString(userName,'userName')
+  content = helpers.checkString(content,'content')
+  const postCollection = await posts()
+  const post = await postCollection.findOne({_id: new ObjectId(postId)});
+  if(post === null){
+    throw 'No post with that postId'
+  }
+  const userCollection = await users()
+  const user = await userCollection.findOne({_id:new ObjectId(userId)});
+  if(user===null){
+    throw 'No user with that userId'
+  }
+  const postedAt = new Date().toUTCString();
+  const newComment = {
+    _id : new ObjectId(),
+    postId : postId,
+    userId : userId,
+    userName : userName,
+    content : content,
+    postedAt : postedAt
+  }
+  const updateInfo = await postCollection.updateOne({_id: new ObjectId(postId)}, {$push: {comments: newReview}},{returnDocument:'after'});
+  if(!updateInfo){
+    throw `Error: Update failed! Could not add the review for the product with productId ${postId}`;
+  }
+  return updateInfo;
+
+};
+export const getAllComments = async (postId) =>{
+  postId = helpers.checkId(postId,'postId')
+  const postCollection = await posts();
+  const post = await postCollection.findOne({_id: new ObjectId(postId)});
+  if (!post) throw 'No post with that postId';
+  if(post.comments.length===0) throw 'No comments for the post'
+  return post.comments;
+}
+
+export const updateLikes = async(postId)=>{
+  postId = helpers.checkId(postId,'postId')
+  const postCollection = await posts();
+  const newPost = await postCollection.findOneAndUpdate({_id: new ObjectId(postId)},
+  {$inc: { likes: 1 }},
+  {returnDocument: 'after'});
+  if (newPost.lastErrorObject.n === 0)
+      throw [404, `Could not update the post with id ${postId}`];
+
+  return newPost.value;
+};
+export const updateDislikes = async(postId)=>{
+  postId = helpers.checkId(postId,'postId')
+  const postCollection = await posts();
+  const newPost = await postCollection.findOneAndUpdate({_id: new ObjectId(postId)},
+  {$inc: { dislikes: 1 }},
+  {returnDocument: 'after'});
+  if (newPost.lastErrorObject.n === 0)
+      throw [404, `Could not update the post with id ${postId}`];
+
+  return newPost.value;
+};
