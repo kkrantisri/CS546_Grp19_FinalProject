@@ -67,7 +67,7 @@ router.route('/')
           role: user.role
         };
       } else {
-        throw new Error('Either username or password');
+        throw 'Either username or password';
       }
       if (user.role === 'admin') {
         res.redirect('/admin');
