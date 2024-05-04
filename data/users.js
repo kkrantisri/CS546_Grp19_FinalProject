@@ -1,6 +1,7 @@
 import { users } from "../config/mongoCollections.js";
 import { ObjectId } from 'mongodb';
 import  { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid } from '../helper.js';
+import bcrypt from 'bcryptjs';
 
 const userCollection = await users();
 const saltRounds = 16;
@@ -34,7 +35,8 @@ export const addUser = async (userData) => {
   const validatedLanguages = checkStringArray(languages, 'languages');
   const validatedCoursesEnrolled = checkStringArray(coursesEnrolled, 'coursesEnrolled');
   const validatedBio = checkString(bio, 'bio');
-  if (!gradYear || typeof gradYear !== 'number' || isNaN(gradYear) || gradYear <= 0) {
+  //gradYear = parseInt(gradYear);
+  if (!gradYear || isNaN(parseInt(gradYear)) || parseInt(gradYear) <= 0) {
     throw 'Grad year must be a positive number!';
   }
 
@@ -88,7 +90,7 @@ export const getUserById = async (userId) => {
   let validatedUserId = checkId(userId);
 
   // const userCollection = await users();
-  const user = await userCollection.findOne({ _id: ObjectId(validatedUserId.trim()) });
+  const user = await userCollection.findOne({ _id: new ObjectId(validatedUserId.trim()) });
   if (!user || user === null) throw 'User not found with that id';
   user._id = user._id.toString();
 

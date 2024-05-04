@@ -27,12 +27,14 @@ router.route('/')
       const validatedUsername =  checkString(username, 'username');
       const validatedPassword =  checkString(password, 'password');
       const validatedEmail =  checkEmail(email);
-      const validatedFullName =  checkString(fullName, 'fullName');
+      const validatedFullName =  checkString(fullname, 'fullName');
       const validatedMajor =  checkString(major, 'major');
+      languages = languages.split(',');
       const validatedLanguages =  checkStringArray(languages, 'languages');
+      coursesEnrolled = coursesEnrolled.split(',');
       const validatedCoursesEnrolled =  checkStringArray(coursesEnrolled, 'coursesEnrolled');
       const validatedBio =  checkString(bio, 'bio');
-      const validatedGradYear =  checkPositiveNumber(gradYear, 'gradYear');
+      //const validatedGradYear =  checkPositiveNumber(gradyear, 'gradYear');
       
       const newUser = await addUser({
         username: validatedUsername,
@@ -43,10 +45,10 @@ router.route('/')
         languages: validatedLanguages,
         coursesEnrolled: validatedCoursesEnrolled,
         bio: validatedBio,
-        gradYear: validatedGradYear
+        gradYear: gradyear
       });
 
-      res.status(200).render('signup', { message: 'Successfully Registered. You can login now.', title: 'Login' });
+      res.status(200).render('signup', { message: 'Successfully Registered. You can login now.',hasMessage:true });
     } catch (error) {
       res.status(400).render('signup', { message: error.message || 'Error: Internal Server Error', title: 'Signup Form' });
     }

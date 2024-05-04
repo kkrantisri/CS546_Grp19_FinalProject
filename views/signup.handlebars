@@ -1,7 +1,7 @@
 <main>
     <div class="signup-page">
         <h2>Signup Form</h2>
-        <form action="/login" method="POST">
+        <form action="/register" method="POST">
             <div class="username-container">
                 <label for="username">Username:</label><br>
                 <input type="text" id="username" name="username" required><br>
@@ -66,5 +66,14 @@
 
             <button type="submit">Sign Up</button>
         </form>
+    </div>
+    <div class="msg">
+        {{#if hasMessage}}
+        
+        <p>{{message}} <a href="/login">Click here to login!</a></p>
+        {{/if}}
+        {{#if haspostNotFoundErrors}}
+        <h1>{{error}}</h1>
+        {{/if}}
     </div>
 </main>
