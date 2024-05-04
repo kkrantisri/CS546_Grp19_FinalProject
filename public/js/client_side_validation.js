@@ -80,6 +80,7 @@ $(document).ready(function() {
             login_form[0].submit();
         }
     });
+    
     $('.accept-button').click(async function() {
         const sessionId = $(this).attr('data-session-id');
         const username = $(this).attr('data-user-name');
