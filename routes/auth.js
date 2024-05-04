@@ -16,69 +16,78 @@ router.route('/')
   router.route('/register')
   .get(async (req, res) => {
     try {
-      res.status(200).render('register', { title: 'Register' });
+      res.status(200).render('signup', { title: 'Signup Page' });
     } catch (error) {
       res.status(500).json({ error: 'Internal Server Error' });
     }
   }).post(async (req, res) => {
     try {
-      let { firstName, lastName, username, password, confirmPassword, favoriteQuote, themePreference, role } = req.body;
-      firstName = helpers.checkString(firstName, 'firstName');
-      lastName = helpers.checkString(lastName, 'lastName');
-      username = helpers.checkString(username, 'username');
-      password = helpers.checkString(password, 'password');
-      confirmPassword = helpers.checkString(confirmPassword, 'confirmPassword');
-      favoriteQuote = helpers.checkString(favoriteQuote, 'favoriteQuote');
-      themePreference = helpers.checkString(themePreference, 'themePreference');
-      role = helpers.checkString(role, 'role');
+      let { username, password, email, fullname, major, languages, coursesEnrolled, reviews, bio, gradyear } = req.body;
+      const validatedUsername = helpers.checkString(username, 'username');
+      const validatedPassword = helpers.checkString(password, 'password');
+      const validatedEmail = helpers.checkEmail(email);
+      const validatedFullName = helpers.checkString(fullName, 'fullName');
+      const validatedMajor = helpers.checkString(major, 'major');
+      const validatedLanguages = helpers.checkStringArray(languages, 'languages');
+      const validatedCoursesEnrolled = helpers.checkStringArray(coursesEnrolled, 'coursesEnrolled');
+      const validatedBio = helpers.checkString(bio, 'bio');
+      const validatedGradYear = helpers.checkPositiveNumber(gradYear, 'gradYear');
+      
+      const newUser = await addUser({
+        username: validatedUsername,
+        password: validatedPassword,
+        email: validatedEmail,
+        fullName: validatedFullName,
+        major: validatedMajor,
+        languages: validatedLanguages,
+        coursesEnrolled: validatedCoursesEnrolled,
+        bio: validatedBio,
+        gradYear: validatedGradYear
+      });
 
-      const insertUser = await registerUser(firstName, lastName, username, password, favoriteQuote, themePreference, role);
-
-      if (insertUser.signupCompleted) {
-        res.status(200).render('login', { message: 'Successfully Registered. You can login now.', title: 'Login' });
-      } else {
-        throw new Error('Internal Server Error');
-      }
+      res.status(200).render('signup', { message: 'Successfully Registered. You can login now.', title: 'Login' });
     } catch (error) {
-      res.status(400).render('register', { message: error.message || 'Error: Internal Server Error', title: 'Register' });
+      res.status(400).render('signup', { message: error.message || 'Error: Internal Server Error', title: 'Signup Form' });
     }
   });
   router.route('/login')
   .get(async (req, res) => {
     try {
-      res.status(200).render('login', { title: 'Login' });
+      res.status(200).render('login', { title: 'Login Form' });
     } catch (error) {
       res.status(500).json({ error: 'Internal Server Error' });
     }
-  })
-  .post(async (req, res) => {
+  }) .post(async (req, res) => {
     try {
       let { username, password } = req.body;
       username = helpers.checkString(username, 'username');
       password = helpers.checkString(password, 'password');
+
+      // Authenticate user
       const user = await loginUser(username, password);
+
+      // If user is authenticated
       if (user) {
         req.session.user = {
-          firstName: user.firstName,
-          lastName: user.lastName,
+          id: user._id, // Assuming `user._id` holds the user's ID after successful authentication
           username: user.username,
-          favoriteQuote: user.favoriteQuote,
-          themePreference: user.themePreference,
-          role: user.role
+          email: user.email,
+          fullName: user.fullName,
+          major: user.major,
+          languages: user.languages,
+          coursesEnrolled: user.coursesEnrolled,
+          bio: user.bio,
+          gradYear: user.gradYear,
+          reviews: user.reviews
         };
+        res.redirect('/posts');
       } else {
-        throw 'Either username or password';
-      }
-      if (user.role === 'admin') {
-        res.redirect('/admin');
-      } else {
-        res.redirect('/user');
+        res.status(401).render('login', { message: 'Invalid username or password.', title: 'Login Form' });
       }
     } catch (error) {
-      res.status(400).render('login', { message: error.message || 'Error: Internal Server Error', title: 'Login' });
+      res.status(400).render('login', { message: error.message || 'Error: Internal Server Error', title: 'Login Form' });
     }
   });
-
 router.route('/logout')
   .get(async (req, res) => {
     try {
@@ -89,19 +98,6 @@ router.route('/logout')
     }
   });
 
-
-router.route('/posts')
-  .get(async (req, res) => {
-    try {
-      if (req.session.user) {
-        res.render('posts', { user: req.session.user });
-      } else {
-        res.redirect('/login');
-      }
-    } catch (error) {
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  });
 
   export default router;
 
