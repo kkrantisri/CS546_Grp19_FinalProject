@@ -304,36 +304,51 @@ export const getReviewsForUser = async (userId) => {
 };
 
 export const loginUser = async (username, password) => {
-  // Retrieve user data from the database based on the provided username
-  const user = await users.findOne({ username });
+  if(!username || !password){
+    throw 'Both Username and Password must be supplied'
+  }
+  if(typeof username!== "string"){
+    throw 'username should be of type string'
+  }
+  username = username.trim()
+  if(username===""||/\d/.test(username)){
+    throw 'username cannot contains numbers or it cannot be just with Spaces'
+  }
+  if(username.length<5||username.length>10){
+    throw 'username should be at least 5 characters long with a max of 10 characters '
+  }
+  username=username.toLowerCase();
+  if(typeof password!=="string"){
+    throw 'Password should be of type string'
+  }
+  password = password.trim()
 
-  // If user with the provided username does not exist, return null
-  if (!user) {
-    return null;
+  if(password===""|| /\s/.test(password) || password.length<8){
+    throw 'Password should not contains spaces and must be minimum 8 characters long'
+  }
+  if(!/[A-Z]/.test(password) || !/\d/.test(password) || !/[!@#$%^&*()\-+={}[\]:;"'<>,.?\/|\\]/.test(password) ){
+    throw 'Password should contain at least one uppercase character and at least one number and there has to be at least one special character'
+  }
+  const userCollection = await users();
+  const usernameFound = await userCollection.findOne({username:username});
+  if(!usernameFound){
+    throw "Either the username or password is invalid"
+  }
+  let compareToMatch = false;
+
+  try {
+    compareToMatch = await bcrypt.compare(password, usernameFound.password);
+  } catch (e) {
+    //no op
   }
 
-  // Compare the provided password with the hashed password stored in the database
-  const passwordMatch = await bcrypt.compare(password, user.password);
-
-  // If passwords match, return the user data excluding the password field
-  if (passwordMatch) {
-    const { _id, username, email, fullName, major, languages, coursesEnrolled, bio, gradYear, reviews } = user;
-    return {
-      _id,
-      username,
-      email,
-      fullName,
-      major,
-      languages,
-      coursesEnrolled,
-      bio,
-      gradYear,
-      reviews
-    };
+  if (compareToMatch) {
+    const { _id,password, ...dataforsessions } = usernameFound
+    return dataforsessions
   } else {
-    // If passwords do not match, return null
-    return null;
+    throw "Either the username or password is invalid"
   }
+
 };
 
 // // 3. Update review

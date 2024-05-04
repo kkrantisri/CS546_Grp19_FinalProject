@@ -75,41 +75,59 @@ router
     }
   })
   .post(async (req, res) => {
+    const userData = req.body;
+    let errors = [];
     try {
-      let { username, password } = req.body;
-      username = checkString(username, "username");
-      password = checkString(password, "password");
-
-      // Authenticate user
-      const user = await loginUser(username, password);
-
-      // If user is authenticated
-      if (user) {
-        req.session.user = {
-          id: user._id, // Assuming `user._id` holds the user's ID after successful authentication
-          username: user.username,
-          email: user.email,
-          fullName: user.fullName,
-          major: user.major,
-          languages: user.languages,
-          coursesEnrolled: user.coursesEnrolled,
-          bio: user.bio,
-          gradYear: user.gradYear,
-          reviews: user.reviews,
-        };
-        res.redirect("/posts");
-      } else {
-        res.status(401).render("login", {
-          message: "Invalid username or password.",
-          title: "Login Form",
-        });
-      }
-    } catch (error) {
-      res.status(400).render("login", {
-        message: error.message || "Error: Internal Server Error",
-        title: "Login Form",
-      });
+      userData.username = checkString(userData.username,'username');
+    } catch (e) {
+      errors.push(e)
     }
+    try {
+      if(!userData.password || typeof userData.password!=="string"){
+        throw 'Password should exists and should be of type string'
+      }
+      userData.password = userData.password.trim()
+    
+      if(userData.password===""|| /\s/.test(userData.password) || userData.password.length<8){
+        throw 'Password should not contains spaces and must be minimum 8 characters long'
+      }
+      if(!/[A-Z]/.test(userData.password) || !/\d/.test(userData.password) || !/[!@#$%^&*()\-+={}[\]:;"'<>,.?\/|\\]/.test(userData.password) ){
+        throw 'Password should contain at least one uppercase character and at least one number and there has to be at least one special character'
+      }
+    } catch (e) {
+      errors.push(e)
+    }
+    if(errors.length>0){
+      res.status(400).render('login',{
+        errors : errors,
+        hasErrors : true,
+      });
+      return;
+    }
+    try{
+      const {username,password} = userData
+      const check = await loginUser(username,password)
+  //     req.session.user = {firstName : check.firstName,
+  //     lastName : check.lastName,
+  //   username : check.username,favoriteQuote:check.favoriteQuote,
+  // themePreference:check.themePreference,role:check.role}
+      // if(check.role==="admin"){
+      //   res.status(200).redirect('/admin')
+      // }
+      
+      res.status(200).redirect('/posts')
+      
+    }
+    catch(e){
+      errors.push(e)
+      res.status(400).render('login',{
+        errors : errors,
+        hasErrors : true,
+       });
+       return ;
+    }
+
+    
   });
 router.route("/logout").get(async (req, res) => {
   try {

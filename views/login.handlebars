@@ -1,13 +1,11 @@
 <main>
     <div class="login-page">
         <h1>Login to DuckPal</h1>
-        <form id="signin-form" action="/post/register" method="post">
+        <form id="signin-form" action="/login" method="POST">
 
             <div class="form-div">
-                <label for="emailId">Email:</label>
-                <input type="email" id="emailId" name="emailId" required placeholder="Enter stevens email">
-                <!-- Error Message for Missing Email -->
-                <div id="no-email" class="alert" role="alert" hidden>Please enter your email</div>
+                <label for="username">Username :</label>
+                <input type="text" id="username" name="username" >
             </div>
 
             <div class="form-div">
@@ -22,7 +20,7 @@
             </div>
 
             <div>
-                <button type="submit" class="btn btn-primary-block">Sign in</button>
+                <button type="submit" id="submitButton" name="submitButton">Login</button>
             </div>
 
             <!-- register -->
