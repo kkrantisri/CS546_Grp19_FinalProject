@@ -4,7 +4,7 @@ import * as userData from './users.js'
 import  { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid } from '../helper.js'
 // Function to get a post by its ID
 export const getPostById = async (id) => {
-  id = helpers.checkId(id);
+  id =  checkId(id);
   const postCollection = await posts();
   const post = await postCollection.findOne({ _id: new ObjectId(id) });
   if (!post) {
@@ -19,15 +19,15 @@ export const getAllPosts = async () => {
   return await postCollection.find({}).toArray();
 };
 export const getPostsByTag = async (tag)=>{
-  tag = helpers.checkString(tag,'Tag')
+  tag =  checkString(tag,'Tag')
   const postCollection = await posts();
   return await postCollection.find({tags: tag}).toArray();
 };
 // Function to create a new post
 export const createPost = async (title, content, userId, tags,course) => {
-  title = helpers.checkString(title, 'Title');
-  content = helpers.checkString(content,'content');
-  course = helpers.checkString(course,'course')
+  title =  checkString(title, 'Title');
+  content =  checkString(content,'content');
+  course =  checkString(course,'course')
   userId = validation.checkId(userId, 'User ID');
   if (!Array.isArray(tags)) {
     tags = [];
@@ -105,10 +105,10 @@ export const deletePost = async (id) => {
   return {...deletionInfo.value, deleted: true};
 };
 export const createComment = async (postId,userId,userName,content) =>{
-  postId = helpers.checkId(postId,'postId')
-  userId = helpers.checkId(userId,'userId')
-  userName = helpers.checkString(userName,'userName')
-  content = helpers.checkString(content,'content')
+  postId =  checkId(postId,'postId')
+  userId =  checkId(userId,'userId')
+  userName =  checkString(userName,'userName')
+  content =  checkString(content,'content')
   const postCollection = await posts()
   const post = await postCollection.findOne({_id: new ObjectId(postId)});
   if(post === null){
@@ -136,7 +136,7 @@ export const createComment = async (postId,userId,userName,content) =>{
 
 };
 export const getAllComments = async (postId) =>{
-  postId = helpers.checkId(postId,'postId')
+  postId =  checkId(postId,'postId')
   const postCollection = await posts();
   const post = await postCollection.findOne({_id: new ObjectId(postId)});
   if (!post) throw 'No post with that postId';
@@ -184,7 +184,7 @@ export const getAllComments = async (postId) =>{
 // };
 
 export const updateLikes = async(postId)=>{
-  postId = helpers.checkId(postId,'postId')
+  postId =  checkId(postId,'postId')
   const postCollection = await posts();
   const newPost = await postCollection.findOneAndUpdate({_id: new ObjectId(postId)},
   {$inc: { likes: 1 }},
@@ -196,7 +196,7 @@ export const updateLikes = async(postId)=>{
   return {updateLikes : true , likes : count};
 };
 export const updateDislikes = async(postId)=>{
-  postId = helpers.checkId(postId,'postId')
+  postId =  checkId(postId,'postId')
   const postCollection = await posts();
   const newPost = await postCollection.findOneAndUpdate({_id: new ObjectId(postId)},
   {$inc: { dislikes: 1 }},

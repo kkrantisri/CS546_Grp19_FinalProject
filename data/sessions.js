@@ -8,13 +8,13 @@ async function updatePendingSessions() {
     status: "pending"}).toArray();
 
   for (const session of pendingSessions) {
-    if(!helpers.isTimeSlotValid(session.timeSlot,session.date))
+    if(! isTimeSlotValid(session.timeSlot,session.date))
     await sessionCollection.updateOne({ _id: session._id }, { $set: { status: "noResponse" } });
   }
 }
 
 export const getAllReceivedSessions = async (username) => {
-  username = helpers.checkString(username,'username');
+  username =  checkString(username,'username');
   await updatePendingSessions();
   const userCollection = await users()
   userFound = await userCollection.findOne({username:username});
@@ -27,7 +27,7 @@ export const getAllReceivedSessions = async (username) => {
   return receivedSessions;
 };
 export const getAllSentSessions = async(username) =>{
-  username = helpers.checkString(username,'username');
+  username =  checkString(username,'username');
   await updatePendingSessions();
   const userCollection = await users()
   userFound = await userCollection.findOne({username:username});
@@ -41,16 +41,16 @@ export const getAllSentSessions = async(username) =>{
 
 // Function to create a new session
 export const createSession = async (course,content,senderName,receiverName,date,timeSlot) => {
-  course = helpers.checkString(course,'course');
-  content = helpers.checkString(content,'content');
-  senderName = helpers.checkString(senderName,'senderName');
-  receiverName = helpers.checkString(receiverName,'receiverName')
-  date = helpers.checkString( date, 'date');
-  if(!helpers.isValidDate(date)){
+  course =  checkString(course,'course');
+  content =  checkString(content,'content');
+  senderName =  checkString(senderName,'senderName');
+  receiverName =  checkString(receiverName,'receiverName')
+  date =  checkString( date, 'date');
+  if(! isValidDate(date)){
     throw "Please enter valid Date in mm/dd/yyyy and Date cannot be Past Date"
   }
-  timeSlot = helpers.checkString(timeSlot,'timeSlot')
-  if(!helpers.isTimeSlotValid(timeSlot,date)){
+  timeSlot =  checkString(timeSlot,'timeSlot')
+  if(! isTimeSlotValid(timeSlot,date)){
     throw "Please select valid time slot and time slot cannot be in Past"
   }
   const userCollection = await users();
@@ -88,9 +88,9 @@ export const createSession = async (course,content,senderName,receiverName,date,
 };
 
 export const updateSessionPatch=async(sessionId,username,status) =>{
-  sessionId = helpers.checkId(sessionId);
-  username = helpers.checkString(username);
-  status = helpers.checkString(status,'status')
+  sessionId =  checkId(sessionId);
+  username =  checkString(username);
+  status =  checkString(status,'status')
   if(status!=="accepted"&&status!=="rejected"){
     throw 'Status should be either accepted or rejected';
   }

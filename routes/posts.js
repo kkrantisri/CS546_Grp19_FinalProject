@@ -24,24 +24,24 @@ router
     queryPostData.userId = userId;
     let errors = [];
     try {
-      queryPostData.title = helpers.checkString(queryPostData.title, 'Title');
+      queryPostData.title =  checkString(queryPostData.title, 'Title');
     } catch (e) {
       errors.push(e);
     }
     try {
-      queryPostData.content = helpers.checkString(queryPostData.content, 'content');
+      queryPostData.content =  checkString(queryPostData.content, 'content');
     } catch (e) {
       errors.push(e);
     }
     try {
-      queryPostData.userId = helpers.checkId(queryPostData.userId, 'userId');
+      queryPostData.userId =  checkId(queryPostData.userId, 'userId');
     } catch (e) {
       errors.push(e);
     }
     if (queryPostData.tags) {
       let tags = queryPostData.tags.split(',');
       try {
-        queryPostData.tags = helpers.checkStringArray(tags, 'Tags');
+        queryPostData.tags =  checkStringArray(tags, 'Tags');
       } catch (e) {
         errors.push(e);
       }
@@ -69,7 +69,7 @@ router
   .get(async (req, res) => {
     const postId = req.params.id
     try {
-      const validPostId = helpers.checkId(postId , 'postId');
+      const validPostId =  checkId(postId , 'postId');
       const postList = await postData.getPostById(validPostId);
       if(!postList){
         throw 'Error : Post Not Found'
@@ -85,10 +85,10 @@ router
     const userName = req.session.user.userName;
     const content = req.body;
     try {
-      postId = helpers.checkId(postId, 'Post ID');
-      userId = helpers.checkId(userId, 'User ID');
-      userName = helpers.checkString(userName, 'User Name');
-      content = helpers.checkString(content, 'Content');
+      postId =  checkId(postId, 'Post ID');
+      userId =  checkId(userId, 'User ID');
+      userName =  checkString(userName, 'User Name');
+      content =  checkString(content, 'Content');
       const postList = await postData.getPostById(postId);
       if(!postList){
         throw 'Error : Post Not Found'
@@ -105,7 +105,7 @@ router
     const postId = req.params.id;
     const updatedPostData = req.body;
     try{
-      const validPostId = helpers.checkId(postId , 'postId');
+      const validPostId =  checkId(postId , 'postId');
       const existingPost = await postData.getPostById(validPostId);
       if(!existingPost){
         throw `Post with ID ${validPostId} not found` 
@@ -126,7 +126,7 @@ router
   .delete(async (req, res) =>{
     const postId = req.params.id;
     try {
-      const validPostId = helpers.checkId(postId, 'postId');
+      const validPostId =  checkId(postId, 'postId');
       const postList = await postData.getPostById(validPostId);
       if(!postList){
         throw 'Error : Post Not Found'
@@ -163,7 +163,7 @@ router
   .post(async (req, res) => {
     const postID = req.params.id;
     try {
-      postID = helpers.checkId(postID , 'postId');
+      postID =  checkId(postID , 'postId');
       const postList = await postData.getPostById(validPostId);
       if(!postList){
         throw 'Error : Post Not Found'
@@ -182,7 +182,7 @@ router
   .post(async (req, res) => {
     const postID = req.params.id;
     try {
-      postID = helpers.checkId(postID , 'postId');
+      postID =  checkId(postID , 'postId');
       const postList = await postData.getPostById(postID);
       if(!postList){
         throw 'Error : Post Not Found'

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 const router = Router();
 import {userData, sessionData} from '../data/index.js';
-import helpers from '../helper.js';
+import  { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid } from '../helper.js';
 
 router.route('/new').get(async (req, res) => {
   const username = req.session.user.username
@@ -16,46 +16,46 @@ router.route('/').post(async (req, res) => {
   const userList = await userData.getAllUsers();
   let errors = [];
   try {
-    sessionFormData.course = helpers.checkString(sessionFormData.course, 'course')
+    sessionFormData.course =  checkString(sessionFormData.course, 'course')
   } catch (error) {
     errors.push(error);
   }
   try {
-    sessionFormData.content = helpers.checkString(sessionFormData.content, 'content')
+    sessionFormData.content =  checkString(sessionFormData.content, 'content')
   } catch (error) {
     errors.push(error)
   }
   try {
-    sessionFormData.timeSlot = helpers.checkString(sessionFormData.timeSlot, 'timeSlot')
+    sessionFormData.timeSlot =  checkString(sessionFormData.timeSlot, 'timeSlot')
   } catch (error) {
     errors.push(error)
   }
   try {
-    sessionFormData.date = helpers.checkRating(sessionFormData.date, 'date')
+    sessionFormData.date =  checkRating(sessionFormData.date, 'date')
   } catch (error) {
     errors.push(error);
   }
   try {
-    if (!helpers.isValidDate(sessionFormData.date)) {
+    if (! isValidDate(sessionFormData.date)) {
       throw "Please enter valid Date in mm/dd/yyyy and Date cannot be Past Date"
     }
   } catch (error) {
     errors.push(error);
   }
   try {
-    if (!helpers.isTimeSlotValid(sessionFormData.timeSlot, sessionFormData.date)) {
+    if (! isTimeSlotValid(sessionFormData.timeSlot, sessionFormData.date)) {
       throw "Please select valid time slot and time slot cannot be in Past"
     }
   } catch (error) {
     errors.push(error)
   }
   try {
-    sessionFormData.receiverName = helpers.checkString(sessionFormData.receiverName, 'receiverName');
+    sessionFormData.receiverName =  checkString(sessionFormData.receiverName, 'receiverName');
   } catch (error) {
     errors.push(error)
   }
   try {
-    senderName = helpers.checkString(senderName, 'senderName');
+    senderName =  checkString(senderName, 'senderName');
   } catch (error) {
     errors.push(error)
   }
@@ -96,7 +96,7 @@ router.route('/').post(async (req, res) => {
 });
 router.route('/:username/sent').get(async (req, res) => {
   try {
-    req.params.username = helpers.checkString(req.params.username, 'username URL Param')
+    req.params.username =  checkString(req.params.username, 'username URL Param')
   } catch (e) {
     res.status(400).render('sessions/errors', { error: e, has400Errors: true });
     return;
@@ -111,7 +111,7 @@ router.route('/:username/sent').get(async (req, res) => {
 });
 router.route('/:username/received').get(async (req, res) => {
   try {
-    req.params.username = helpers.checkString(req.params.username, 'username URL Param')
+    req.params.username =  checkString(req.params.username, 'username URL Param')
   } catch (e) {
     res.status(400).render('sessions/errors', { error: e, has400Errors: true });
     return;
@@ -130,17 +130,17 @@ router.route('/:username/received/:sessionId').patch(async (req, res) => {
   const sessionId = req.params.sessionId;
   let errors = []
   try {
-    status = helpers.checkString(status, 'status');
+    status =  checkString(status, 'status');
   } catch (e) {
     errors.push(e)
   }
   try {
-    username = helpers.checkString(username, 'username');
+    username =  checkString(username, 'username');
   } catch (e) {
     errors.push(e)
   }
   try {
-    sessionId = helpers.checkId(sessionId, 'sessionId')
+    sessionId =  checkId(sessionId, 'sessionId')
   } catch (e) {
     errors.push(e)
   }

@@ -24,15 +24,15 @@ router.route('/')
   }).post(async (req, res) => {
     try {
       let { username, password, email, fullname, major, languages, coursesEnrolled, reviews, bio, gradyear } = req.body;
-      const validatedUsername = helpers.checkString(username, 'username');
-      const validatedPassword = helpers.checkString(password, 'password');
-      const validatedEmail = helpers.checkEmail(email);
-      const validatedFullName = helpers.checkString(fullName, 'fullName');
-      const validatedMajor = helpers.checkString(major, 'major');
-      const validatedLanguages = helpers.checkStringArray(languages, 'languages');
-      const validatedCoursesEnrolled = helpers.checkStringArray(coursesEnrolled, 'coursesEnrolled');
-      const validatedBio = helpers.checkString(bio, 'bio');
-      const validatedGradYear = helpers.checkPositiveNumber(gradYear, 'gradYear');
+      const validatedUsername =  checkString(username, 'username');
+      const validatedPassword =  checkString(password, 'password');
+      const validatedEmail =  checkEmail(email);
+      const validatedFullName =  checkString(fullName, 'fullName');
+      const validatedMajor =  checkString(major, 'major');
+      const validatedLanguages =  checkStringArray(languages, 'languages');
+      const validatedCoursesEnrolled =  checkStringArray(coursesEnrolled, 'coursesEnrolled');
+      const validatedBio =  checkString(bio, 'bio');
+      const validatedGradYear =  checkPositiveNumber(gradYear, 'gradYear');
       
       const newUser = await addUser({
         username: validatedUsername,
@@ -61,8 +61,8 @@ router.route('/')
   }) .post(async (req, res) => {
     try {
       let { username, password } = req.body;
-      username = helpers.checkString(username, 'username');
-      password = helpers.checkString(password, 'password');
+      username =  checkString(username, 'username');
+      password =  checkString(password, 'password');
 
       // Authenticate user
       const user = await loginUser(username, password);
