@@ -196,7 +196,7 @@ export const getCoursesbyUserName = async (username) =>{
 export const createreviewbyuserid = async(userId , reviewId , review , rating) => {
   const validatedUserId = checkId(userId);
   const validatedReviewerId = checkId(reviewId);
-  const reviewerUsername = await getUsernameById(validatedReviewerId);
+  const reviewerUsername = await getUserByUsername(validatedReviewerId);
   const user = await userCollection.findOne({_id : validatedUserId});
   if(!user){
     throw 'Error : User not found'
@@ -302,62 +302,94 @@ export const getReviewsForUser = async (userId) => {
   return user.reviews;
 };
 
+export const loginUser = async (username, password) => {
+  // Retrieve user data from the database based on the provided username
+  const user = await users.findOne({ username });
 
-// 3. Update review
-export const updateReviewForUser = async (userId, reviewId, updatedReview) => {
-  const validatedUserId = checkId(userId, 'userId');
-  const validatedReviewId = checkId(reviewId, 'reviewId');
-
-  if (!updatedReview || typeof updatedReview !== 'object') {
-    throw new Error('Invalid or missing updated review data!');
+  // If user with the provided username does not exist, return null
+  if (!user) {
+    return null;
   }
 
-  const { reviewerId, review, rating } = updatedReview;
-  const validatedReviewerId = checkId(reviewerId, 'reviewerId');
-  const validatedReview = checkString(review, 'review');
-  const validatedRating = checkRating(rating);
+  // Compare the provided password with the hashed password stored in the database
+  const passwordMatch = await bcrypt.compare(password, user.password);
 
-  // targeting the specific review within the user document
-  const updateId = {
-    _id: ObjectId(validatedUserId),
-    'reviews._id': ObjectId(validatedReviewId)
-  };
-
-  const newReview = {
-    _id: ObjectId(validatedReviewId),
-    reviewerId: ObjectId(validatedReviewerId),
-    review: validatedReview,
-    rating: validatedRating
-  };
-
-  //updating review
-  const updateInfo = await userCollection.updateOne(updateId, { $set: { 'reviews.$': newReview } });
-
-  if (!updateInfo.matchedCount || !updateInfo.modifiedCount) {
-    throw new Error('Failed to update review.');
+  // If passwords match, return the user data excluding the password field
+  if (passwordMatch) {
+    const { _id, username, email, fullName, major, languages, coursesEnrolled, bio, gradYear, reviews } = user;
+    return {
+      _id,
+      username,
+      email,
+      fullName,
+      major,
+      languages,
+      coursesEnrolled,
+      bio,
+      gradYear,
+      reviews
+    };
+  } else {
+    // If passwords do not match, return null
+    return null;
   }
-
-  return updateInfo;
 };
 
+// // 3. Update review
+// export const updateReviewForUser = async (userId, reviewId, updatedReview) => {
+//   const validatedUserId = checkId(userId, 'userId');
+//   const validatedReviewId = checkId(reviewId, 'reviewId');
 
-// 4. Delete review for user
-export const deleteReviewForUser = async (userId, reviewId) => {
-  if (!userId || !reviewId) {
-    throw new Error('User ID and Review ID must be provided to delete a review!');
-  }
+//   if (!updatedReview || typeof updatedReview !== 'object') {
+//     throw new Error('Invalid or missing updated review data!');
+//   }
 
-  const validatedUserId = checkId(userId, 'userId');
-  const validatedReviewId = checkId(reviewId, 'reviewId');
+//   const { reviewerId, review, rating } = updatedReview;
+//   const validatedReviewerId = checkId(reviewerId, 'reviewerId');
+//   const validatedReview = checkString(review, 'review');
+//   const validatedRating = checkRating(rating);
 
-  const updateInfo = await userCollection.updateOne(
-    { _id: ObjectId(validatedUserId) },
-    { $pull: { reviews: { _id: ObjectId(validatedReviewId) } } }
-  );
+//   // targeting the specific review within the user document
+//   const updateId = {
+//     _id: ObjectId(validatedUserId),
+//     'reviews._id': ObjectId(validatedReviewId)
+//   };
 
-  if (!updateInfo.matchedCount || !updateInfo.modifiedCount) {
-    throw new Error('Failed to delete review!');
-  }
+//   const newReview = {
+//     _id: ObjectId(validatedReviewId),
+//     reviewerId: ObjectId(validatedReviewerId),
+//     review: validatedReview,
+//     rating: validatedRating
+//   };
 
-  return { success: true };
-};
+//   //updating review
+//   const updateInfo = await userCollection.updateOne(updateId, { $set: { 'reviews.$': newReview } });
+
+//   if (!updateInfo.matchedCount || !updateInfo.modifiedCount) {
+//     throw new Error('Failed to update review.');
+//   }
+
+//   return updateInfo;
+// };
+
+
+// // 4. Delete review for user
+// export const deleteReviewForUser = async (userId, reviewId) => {
+//   if (!userId || !reviewId) {
+//     throw new Error('User ID and Review ID must be provided to delete a review!');
+//   }
+
+//   const validatedUserId = checkId(userId, 'userId');
+//   const validatedReviewId = checkId(reviewId, 'reviewId');
+
+//   const updateInfo = await userCollection.updateOne(
+//     { _id: ObjectId(validatedUserId) },
+//     { $pull: { reviews: { _id: ObjectId(validatedReviewId) } } }
+//   );
+
+//   if (!updateInfo.matchedCount || !updateInfo.modifiedCount) {
+//     throw new Error('Failed to delete review!');
+//   }
+
+//   return { success: true };
+// };
