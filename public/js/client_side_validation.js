@@ -57,6 +57,7 @@ $(document).ready(function() {
         }
     });
   
+    // AJAX login for submission
     login_form.submit(function(event) {
         event.preventDefault();
   
@@ -66,19 +67,47 @@ $(document).ready(function() {
         let username = $('#username').val().trim();
         let password = $('#password').val().trim();
   
-        function validateField() {
-            if (!username || !password) {
-                return 'Both username and password must be supplied';
-            }
-            return null;
+        if (!username || !password) {
+            errorDiv.show().append($('<p>').text('Both username and password must be supplied'));
+            return;
         }
-  
-        let error = validateField();
-        if (error) {
-            errorDiv.show().append($('<p>').text(error));
-        } else {
-            login_form[0].submit();
+
+        if (username && password) {
+            // Setting up AJAX request configuration
+            let requestConfig = {
+                method: 'POST',
+                url: '/login',
+                data: {
+                    username: username,
+                    password: password
+                }
+            };
+
+            // Sending AJAX request for login
+            $.ajax(requestConfig)
+                .done(function(response) {
+                    // successful login
+                    console.log('Login successful:', response);
+                })
+                .fail(function(xhr, status, error) {
+                    // error logging in
+                    console.error('Login error:', error);
+                    errorDiv.show().text('Invalid username or password. Please try again.');
+                });
         }
+
+        // function validateField() {
+        //     if (!username || !password) {
+        //         return 'Both username and password must be supplied';
+        //     }
+        //     return null;
+        // }
+        // let error = validateField();
+        // if (error) {
+        //     errorDiv.show().append($('<p>').text(error));
+        // } else {
+        //     login_form[0].submit();
+        // }
     });
     
     $('.accept-button').click(async function() {
