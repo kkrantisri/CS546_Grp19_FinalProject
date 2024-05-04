@@ -1,7 +1,8 @@
 import {Router} from 'express';
 const router = Router();
 import {userData, sessionData} from '../data/index.js';
-import helpers from '../helper.js';
+import  { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid } from '../helper.js';
+
 
 router.route('/new').get(async(req,res)=>{
   const username = req.session.user.username

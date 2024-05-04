@@ -1,6 +1,6 @@
 import { sessions,users } from "../config/mongoCollections.js";
 import { ObjectId, ReturnDocument } from 'mongodb';
-import helpers from '../helper.js'
+import  { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid } from '../helper.js'
 
 async function updatePendingSessions() {
   const sessionCollection = await sessions();

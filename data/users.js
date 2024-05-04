@@ -1,7 +1,6 @@
 import { users } from "../config/mongoCollections.js";
 import { ObjectId } from 'mongodb';
-import { checkId, checkString, checkStringArray, checkEmail, checkRating } from '../helper.js';
-import { helpers } from "handlebars";
+import  { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid } from '../helper.js';
 
 const userCollection = await users();
 const saltRounds = 16;

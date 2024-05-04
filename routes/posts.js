@@ -1,7 +1,7 @@
 import {Router} from 'express';
 const router = Router();
 import {postData, userData} from '../data/index.js';
-import helpers from '../helper.js';
+import  { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid } from '../helper.js';
 import { updateLikes } from '../data/posts.js';
 
 router.route('/new').get(async (req, res) => {
@@ -195,4 +195,4 @@ router
       res.status(400).json({error: e});
     }
   });
-
+export default router;

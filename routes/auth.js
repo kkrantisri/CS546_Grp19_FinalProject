@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { users } from '../config/mongoCollections.js';
-import { registerUser, loginUser } from '../data/users.js';
+import { addUser, loginUser } from '../data/users.js';
+import  { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid } from '../helper.js';
 import bcrypt from 'bcrypt';
 const router = Router();
 

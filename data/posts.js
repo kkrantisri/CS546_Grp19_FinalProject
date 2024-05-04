@@ -1,7 +1,7 @@
 import { posts, users } from "../config/mongoCollections.js";
 import { ObjectId } from 'mongodb';
 import * as userData from './users.js'
-import helpers from '../helper.js'
+import  { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid } from '../helper.js'
 // Function to get a post by its ID
 export const getPostById = async (id) => {
   id = helpers.checkId(id);

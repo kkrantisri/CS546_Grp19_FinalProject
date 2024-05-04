@@ -1,3 +1,6 @@
+import {Router} from 'express';
+const router = Router();
+import { getUserById } from '../data/users.js';
 router.route('/users/:id')
   .get(async (req, res) => {
     try {
@@ -12,3 +15,4 @@ router.route('/users/:id')
       res.status(500).json({ error: 'Internal Server Error' });
     }
   });
+  export default router;
