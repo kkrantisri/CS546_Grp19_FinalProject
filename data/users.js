@@ -269,7 +269,7 @@ export const addReviewToUser = async (userId, reviewerId, reviewText, rating) =>
 
   const newReview = {
     _id: new ObjectId(),
-    reviewerId: ObjectId(reviewerId),
+    reviewerId:  new ObjectId(reviewerId),
     review: reviewText,
     rating: rating
   };
@@ -293,9 +293,9 @@ export const getReviewsForUser = async (userId) => {
     throw new Error('User ID must be provided to fetch reviews!');
   }
 
-  userId = checkId(userId);
+  userId = checkId(userId.toString());
 
-  const user = await userCollection.findOne({ _id: ObjectId(userId) });
+  const user = await userCollection.findOne({ _id: new ObjectId(userId) });
   if (!user) {
     throw new Error('User not found!');
   }
