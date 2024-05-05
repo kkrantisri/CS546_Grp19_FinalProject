@@ -215,9 +215,17 @@ export const createreviewbyuserid = async(userId , reviewId , review , rating) =
     { $set: { reviews: user.reviews } }
   );
   return user;
-
-
 }
+
+
+
+                          ///////////////////////////////////
+    // write deletedUserById function for routes/users.js - router.route('/').delete(async (req, res)) //
+                          ///////////////////////////////////
+
+
+
+
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // OPTIONAL

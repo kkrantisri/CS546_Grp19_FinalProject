@@ -1,15 +1,27 @@
-<main>
-    <h2>Welcome, {{username}}!</h2>
-    <section>
-        <h3>Actions</h3>
-        <ul>
-            <li><a href="/posts/new">Create New Post</a></li>
-            <li><a href="/posts">View All Posts</a></li>
-            <li><a href="/sessions/new">Create Study Session</a></li>
-        </ul>
-    </section>
-    <section>
-        <h3>My Posts</h3>
-        <a href="/posts/index"></a>
-    </section>
-</main>
+{{!-- 
+        <h2>Welcome, {{username}}!</h2>
+        <section>
+            <h3>Actions</h3>
+            <ul>
+                <li><a href="/posts/new">Create New Post</a></li>
+                <li><a href="/posts">View All Posts</a></li>
+                <li><a href="/sessions/new">Create Study Session</a></li>
+            </ul>
+        </section>
+        <section>
+            <h3>My Posts</h3>
+            <a href="/posts/index"></a>
+        </section>
+    </main> --}}
+
+<h1>My Profile</h1>
+<p>Username: {{user.username}}</p>
+<p>Email: {{user.email}}</p>
+<p>Full Name: {{user.fullName}}</p>
+<p>Major: {{user.major}}</p>
+<p>Languages: {{user.languages}}</p>
+<p>Courses Enrolled: {{user.coursesEnrolled}}</p>
+<p>Bio: {{user.bio}}</p>
+<p>Graduation Year: {{user.gradYear}}</p>
+
+<a href="/users/edit">Edit Profile</a>

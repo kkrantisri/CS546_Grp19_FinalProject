@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+</head>
+<body>
+    <h1>User List</h1>
+    <ul>
+        {{#each allUsers}}
+            <li>
+                <a href="/users/{{this.username}}">{{this.fullName}}</a>
+            </li>
+        {{/each}}
+    </ul>
+</body>
+</html>
+
+
+                            {{!-- ONE OF THESE TWO..TBD --}}
+
+<!-- admin.handlebars -->
+{{!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+</head>
+<body>
+    <h1>User List - Admin Panel</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Full Name</th>
+                <th>Major</th>
+                <th>Languages</th>
+                <th>Courses Enrolled</th>
+                <th>Bio</th>
+                <th>Graduation Year</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each allUsers}}
+            <tr>
+                <td>{{this._id}}</td>
+                <td>{{this.username}}</td>
+                <td>{{this.email}}</td>
+                <td>{{this.fullName}}</td>
+                <td>{{this.major}}</td>
+                <td>{{this.languages.join(', ')}}</td>
+                <td>{{this.coursesEnrolled.join(', ')}}</td>
+                <td>{{this.bio}}</td>
+                <td>{{this.gradYear}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</body>
+</html> --}}

@@ -136,5 +136,32 @@ const isTimeSlotValid = (selectedTimeSlot, dateString) => {
   }
 };
 
-export { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid };
+
+const checkPassword = (password) => {
+  // Password must contain at least one uppercase letter, one lowercase letter,
+  // one special character, one number, and have a minimum length of 5 characters
+
+  const uppercaseRegex = /[A-Z]/;
+  const lowercaseRegex = /[a-z]/;
+  const specialCharRegex = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/;
+  const numberRegex = /[0-9]/;
+
+  if (
+    password.length < 5 ||
+    !uppercaseRegex.test(password) ||
+    !lowercaseRegex.test(password) ||
+    !specialCharRegex.test(password) ||
+    !numberRegex.test(password)
+  ) {
+    throw new Error(
+      'Password must contain at least one uppercase letter, one lowercase letter, one special character, one number, and have a minimum length of 5 characters.'
+    );
+  }
+
+  // Return the validated password
+  return password;
+}
+
+
+export { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid, checkPassword };
 
