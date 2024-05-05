@@ -5,54 +5,41 @@ import {postData, userData} from '../data/index.js';
 import  { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid } from '../helper.js';
 
 
-router.route('/users/:id')
+router.route('/')
   .get(async (req, res) => {
     try {
-      const userId = req.params.id;
-      const user = await getUserById(userId);
-      if (user) {
-        res.render('user_profile', { user });
-      } else {
-        res.status(404).json({ error: 'User not found' });
-      }
+      const allUsers = await getAllUsers();
+      res.render('admin', {allUsers})
     } catch (error) {
-      res.status(500).json({ error: 'Internal Server Error' });
+      res.status(404).render('error',{message : error});
+    }    
+  }).patch(async (req, res) => {
+    try{
+    const updatedUserData = req.body;
+    if (!updatedUserData || typeof updatedUserData !== 'object' || Array.isArray(updatedUserData)) {
+      throw 'Invalid or missing updated user data.';
     }
+    const user = req.session.user;
+    const { username, password, email, fullName, major, languages, coursesEnrolled, bio, gradYear } = updateFields;
+    const userId = checkId(user._id);
+    const {}
+    }catch(e){
+      res.status(400).render('editUser', {message : e})
+    }
+    try{
+
+    }
+    
+   
+  }).delete(async (req, res) => {
+
   });
-
-// get - myProfile
-router.route('/users/myProfile')
+router.route('/users/:id')
   .get(async (req, res) => {
-    if (req.session.user) {
-      try {
-        const userInfo = await getUserById(req.session.user);
-        return res.render("users/index", {
-          userInfo: userInfo,
-          userLoggedIn: true
-        }) 
-      } catch (e) {
-          res.status(500).render("error", { errors: e, userLoggedIn: true });
-    }
-  } else {
-    return res.redirect("/login");
-  }
+
+});  
+router.route("/users/:id/reviews")
+  .post(async (req, res) => {
+    
 });
-
-// Get - Edit myProfile
-router.route("/users/myProfileEdit")
-  .get(async (req, res) => {
-  if (req.session.user) {
-    const userInfo = await users.getUserById(req.session.user);
-    return res.render("users/editUser", {
-      userInfo: userInfo,
-      userLoggedIn: true,
-    });
-  } else {
-    return res.redirect("/login");
-  }
-});
-
-// Post - Edit Profile
-
-
 export default router;
