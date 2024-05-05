@@ -1,22 +1,22 @@
-  <main>
-        <h2>All Posts</h2>
-        <section>
-            <form action="/posts/tag" method="GET">
-                <label for="tag">Search by Tag:</label>
-                <input type="text" id="tag" name="tag">
-                <button type="submit">Search</button>
-            </form>
-        </section>
-        <section>
-            <h3>Posts</h3>
-            <ul>
-                {{#each posts}}
-                    <li>
-                        <h4>{{title}}</h4>
-                        <p>{{content}}</p>
-                        <p>Tags: {{tags}}</p>
-                    </li>
-                {{/each}}
-            </ul>
-        </section>
-    </main>
+<main>
+    <h2>All Posts</h2>
+    <section>
+        <form action="/posts/tag" method="GET">
+            <label for="tag">Search by Tag:</label>
+            <input type="text" id="tag" name="tag">
+            <button type="submit">Search</button>
+        </form>
+    </section>
+    <section>
+        <h3>Posts</h3>
+        <ul>
+            {{#each posts}}
+            <li>
+                <h4>{{title}}</h4>
+                <p>{{content}}</p>
+                <p>Tags: {{tags}}</p>
+            </li>
+            {{/each}}
+        </ul>
+    </section>
+</main>

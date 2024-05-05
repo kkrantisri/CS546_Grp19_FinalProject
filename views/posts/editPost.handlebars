@@ -1,11 +1,11 @@
-  <main>
-        <form action="/posts/{{post._id}}" method="PATCH">
-            <label for="title">Title:</label><br>
-            <input type="text" id="title" name="title" value="{{post.title}}" required><br>
-            <label for="content">Content:</label><br>
-            <textarea id="content" name="content" rows="4" required>{{post.content}}</textarea><br>
-            <label for="tags">Tags:</label><br>
-            <input type="text" id="tags" name="tags" value="{{post.tags}}"><br>
-            <button type="submit">Submit</button>
-        </form>
-    </main>
+<main>
+    <form action="/posts/{{post._id}}" method="PATCH">
+        <label for="title">Title:</label><br>
+        <input type="text" id="title" name="title" value="{{post.title}}" required><br>
+        <label for="content">Content:</label><br>
+        <textarea id="content" name="content" rows="4" required>{{post.content}}</textarea><br>
+        <label for="tags">Tags:</label><br>
+        <input type="text" id="tags" name="tags" value="{{post.tags}}"><br>
+        <button type="submit">Submit</button>
+    </form>
+</main>

@@ -34,33 +34,38 @@
 
             <div class="coursesEnrolled-container">
                 <label for="coursesEnrolled">Courses Enrolled:</label><br>
-                <select id="editCoursesEnrolled" name="coursesEnrolled" required>
-                    <option value="{{userInfo.coursesEnrolled}}" selected>{{userInfo.coursesEnrolled}}</option>
-                    <option value="CS546">Web programming</option>
-                    <option value="CS555">Agile</option>
-                    <option value="CS545">Human Computer Interaction</option>
-                    <option value="CS570">Data Structures</option>
-                    <option value="CS556">Mathematical Foundations of Machine Learning</option>
-                    <option value="cs513">Knowledge Discovery and data Mining</option>
-                </select>
-            </div>
+                <div class="selected-courses">
+                    <label for="selectedCourses">Selected Courses:</label><br>
+                    <textarea id="selectedCourses" rows="4" cols="50" readonly></textarea>
+                </div>
 
-            <div class="reviews-container">
-                <label for="reviews">Reviews:</label><br>
-                <input type="text" id="editReviews" name="reviews" value="{{userInfo.reviews}}"><br>
-            </div>
+                <script>
+                    const coursesEnrolledSelect = document.getElementById("coursesEnrolled");
+                    const selectedCoursesTextarea = document.getElementById("selectedCourses");
 
-            <div class="bio-container">
-                <label for="bio">Bio:</label><br>
-                <textarea id="editBio" name="bio" rows="4" cols="50">{{userInfo.bio}}</textarea><br>
-            </div>
+                    // Event listener to update the textbox when selection changes
+                    coursesEnrolledSelect.addEventListener("change", function () {
+                        const selectedOptions = Array.from(this.selectedOptions).map(option => option.text);
+                        selectedCoursesTextarea.value = selectedOptions.join("\n");
+                    });
+                </script>
 
-            <div class="gradyear-container">
-                <label for="gradyear">Graduation Year:</label><br>
-                <input type="text" id="editGradyear" name="gradyear" required value="{{userInfo.gradyear}}"><br>
-            </div>
+                <div class="reviews-container">
+                    <label for="reviews">Reviews:</label><br>
+                    <input type="text" id="editReviews" name="reviews" value="{{userInfo.reviews}}"><br>
+                </div>
 
-            <button type="submit">Update Profile</button>
+                <div class="bio-container">
+                    <label for="bio">Bio:</label><br>
+                    <textarea id="editBio" name="bio" rows="4" cols="50">{{userInfo.bio}}</textarea><br>
+                </div>
+
+                <div class="gradyear-container">
+                    <label for="gradyear">Graduation Year:</label><br>
+                    <input type="text" id="editGradyear" name="gradyear" required value="{{userInfo.gradyear}}"><br>
+                </div>
+
+                <button type="submit">Update Profile</button>
         </form>
     </div>
 </main>
