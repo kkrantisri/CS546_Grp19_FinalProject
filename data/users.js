@@ -73,7 +73,8 @@ export const addUser = async (userData) => {
     coursesEnrolled: validatedCoursesEnrolled,
     bio: validatedBio,
     gradYear: gradYear,
-    reviews: []
+    reviews: [],
+    role : 'user'
   };
   const insertInfo = await userCollection.insertOne(newUserObj);
   if (!insertInfo.acknowledged || !insertInfo.insertedId || insertInfo.insertedCount === 0) throw 'Could not add user!';

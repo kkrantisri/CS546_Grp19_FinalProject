@@ -20,7 +20,6 @@ router.route("/").get(async (req, res) => {
     res.status(500).json({ error: "Internal Server Error" });
   }
 });
-
 router
   .route("/register")
   .get(async (req, res) => {
