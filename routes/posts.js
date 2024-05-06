@@ -4,7 +4,7 @@ import {postData, userData} from '../data/index.js';
 import  { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid, checkUsername } from '../helper.js';
 import { updateLikes } from '../data/posts.js';
 import { getUserById } from '../data/users.js';
-
+import xss from 'xss';
 router.route('/new').get(async (req, res) => {
   res.render('posts/createPost');
 });
@@ -25,6 +25,11 @@ router
   })
   .post(async (req, res) =>{
     const queryPostData = req.body;
+    queryPostData.title = xss(queryPostData.title)
+    queryPostData.userId = xss(queryPostData.userId)
+    queryPostData.content = xss(queryPostData.content)
+    queryPostData.course = xss(queryPostData.course)
+    queryPostData.tags = xss(queryPostData.tags)
     const userId = req.session.user.id.toString();
     const username = req.session.user.username;
     queryPostData.userId = userId;
@@ -87,16 +92,21 @@ router
   router
   .route('/:id')
   .get(async (req, res) => {
-    const postId = req.params.id
+    const postId = req.params.id;
     try {
-      const validPostId =  checkId(postId , 'postId');
-      const postList = await postData.getPostById(validPostId);
-      if(!postList){
-        throw 'Error : Post Not Found'
+      const validPostId = checkId(postId, 'postId');
+      const allPosts = await postData.getAllPosts();
+  
+      // Filter posts with the same posterId
+      const postsWithSamePosterId = allPosts.filter(post => post.posterId === validPostId);
+  
+      if (postsWithSamePosterId.length === 0) {
+        throw 'No posts made by you';
       }
-      res.render('posts/postDetails', {postList});
+  
+      res.render('posts/postDetails', { postList: postsWithSamePosterId });
     } catch (e) {
-      res.status(404).json({error: e});
+      res.status(404).json({ error: e });
     }
   })
   // .post(async (req, res) => {
@@ -121,9 +131,38 @@ router
   //     res.status(400).json({error: e});
   //   }
   // })
+//})
+
+  .post(async (req, res) => {
+    const postId = req.params.id;
+    const userId = req.session.user.userId;
+    const userName = req.session.user.userName;
+    const content =  req.body;
+    content = xss(content);
+    try {
+      postId =  checkId(postId, 'Post ID');
+      userId =  checkId(userId, 'User ID');
+      userName =  checkUsername(userName, 'User Name');
+      content =  checkString(content, 'Content');
+      const postList = await postData.getPostById(postId);
+      if(!postList){
+        throw 'Error : Post Not Found'
+      }
+      const newComment = await postData.createComment(postId, userId, userName, content);
+      if(newComment.commentCompleted === true){
+        res.render('postDetails', {message : 'Sucessfully added the comment!!'});
+      }
+    } catch (e) {
+      res.status(400).json({error: e});
+    }
+  })
   .patch(async (req, res) =>{
     const postId = req.params.id;
     const updatedPostData = req.body;
+    updatedPostData.title = xss(updatedPostData.title);
+    updatedPostData.content = xss(updatedPostData.content);
+    updatedPostData.course = xss(updatedPostData.course);
+    updatedPostData.tags = xss(updatedPostData.tags)
     try{
       const validPostId =  checkId(postId , 'postId');
       const existingPost = await postData.getPostById(validPostId);
@@ -221,7 +260,7 @@ router
       res.status(403).render('posts/wrongAccess',{wrongAccess:true});
     }else{
       const post = await postData.getPostById(req.params.id);
-      res.render('posts/editPost',{post:post});
+      res.render('posts/editPost',{post:post , postId : req.params.id});
 
     }
     
@@ -259,14 +298,18 @@ router
       if(!requestBody.title && !requestBody.course && !requestBody.content && !requestBody.tags){
         throw "You must provide atleast one field to update";
       }
-      if (requestBody.title)
-        requestBody.title = checkString(requestBody.title, 'Title');
-      if (requestBody.course)
-      requestBody.course = checkString(requestBody.course, 'Course');
-      if (requestBody.content)
-      requestBody.content = checkString(requestBody.content, 'content');
+      if (requestBody.title){
+        requestBody.title = xss(requestBody.title);
+        requestBody.title = checkString(requestBody.title, 'Title');}
+      if (requestBody.course){
+        requestBody.course = xss(requestBody.course)
+      requestBody.course = checkString(requestBody.course, 'Course');}
+      if (requestBody.content){
+        requestBody.content = xss(requestBody.content)
+      requestBody.content = checkString(requestBody.content, 'content');}
       
       if (requestBody.tags){
+        requestBody.tags = xss(requestBody.tags)
          let tags = requestBody.tags.split(',');
         requestBody.tags = checkStringArray(
           tags,
@@ -294,7 +337,7 @@ router
   router.route('/:id/likes/').post(async(req,res)=>{
     const postId = req.params.id;
     const username = req.session.user.username;
-    const action = req.body.action;
+    const action =req.body.action;
     // let errors = []
     // try {
     //   postId = checkId(postId,'postId')

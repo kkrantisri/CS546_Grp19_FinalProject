@@ -13,6 +13,7 @@ import {
   checkUsername,
 } from "../helper.js";
 import bcrypt from "bcrypt";
+import xss from "xss";
 const router = Router();
 
 router.route("/").get(async (req, res) => {
@@ -34,7 +35,14 @@ router
   })
   .post(async (req, res) => {
     try {
-      let { username, password, email, fullname, major, languages, coursesEnrolled, reviews, bio, gradyear } = req.body;
+      let { username, password, email, fullname, major, languages, coursesEnrolled, bio, gradyear } = req.body;
+      username = xss(username);
+      password = xss(password);
+      email = xss(email);
+      fullname = xss(fullname);
+      major = xss(major);
+      bio = xss(bio);
+      gradyear = xss(gradyear);
       const validatedUsername =  checkUsername(username, 'username');
       const validatedPassword =  checkPassword(password);
       const validatedEmail =  checkEmail(email);
@@ -61,7 +69,8 @@ router
       res.status(200).render('signup', { message: 'Successfully Registered. You can login now.',hasMessage:true });
     } catch (error) {
       res.status(400).render("signup", {
-        message: error.message || "Error: Internal Server Error",
+        message: error,
+        hasMessage : true,
         title: "Signup Form",
       });
     }
@@ -76,7 +85,10 @@ router
     }
   })
   .post(async (req, res) => {
-    const userData = req.body;
+    var userData =req.body;
+    userData.username = xss(req.body.username);
+    userData.password = xss(req.body.password);
+
     let errors = [];
     try {
       userData.username = checkString(userData.username,'username');

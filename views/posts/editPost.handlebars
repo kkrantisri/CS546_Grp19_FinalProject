@@ -1,5 +1,5 @@
 <main>
-    <form action="/posts/{{post._id}}/update" method="POST">
+    <form id="updatePostForm" action="/posts/{{postId}}/update" method="POST">
         <label for="course">Course:</label><br>
         <input type="text" id="course" name="course" value="{{post.course}}"><br>
         <label for="title">Title:</label><br>
@@ -10,9 +10,9 @@
         <input type="text" id="tags" name="tags" placeholder="Seperated by comma"><br>
         <button type="submit">Submit</button>
     </form>
+    <p><div id="errors"></div></p>
     {{#if hasErrors}}
     <p>{{error}}</p>
-     
     {{/if}}
 
 </main>

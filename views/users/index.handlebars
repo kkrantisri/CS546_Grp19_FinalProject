@@ -1,6 +1,25 @@
 <main>
     <h2>Welcome, {{username}}!</h2>
     <section>
+            <h2>User Details</h2>
+    <p>Username: {{user.username}}</p>
+    <p>Major: {{user.major}}</p>
+    <p>Courses Enrolled: {{user.coursesEnrolled}}</p>
+    <p>Languages: {{user.languages}}</p>
+    <p>Email: {{user.email}}</p>
+    <p>Bio: {{user.bio}}</p>
+    <p>Graduation Year: {{user.gradyear}}</p>
+
+     <h3>Reviews:</h3>
+    <ul>
+        {{#each user.reviews}}
+        <li>
+            <p>Review: {{this.review}}</p>
+            <p>Rating: {{this.rating}}</p>
+        </li>
+        {{/each}}
+    </ul>
+        
         <h3>Actions</h3>
         <ul>
            <li>

@@ -2,7 +2,7 @@ import { Router } from 'express';
 const router = Router();
 import {userData, sessionData} from '../data/index.js';
 import  { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid } from '../helper.js';
-
+import xss from 'xss';
 router.route('/new').get(async (req, res) => {
   const username = req.session.user.username
   const coursesList = await userData.getCoursesbyUserName(username);
@@ -11,6 +11,10 @@ router.route('/new').get(async (req, res) => {
 });
 router.route('/').post(async (req, res) => {
   const sessionFormData = req.body;
+  sessionFormData.course = xss( sessionFormData.course)
+  sessionFormData.content = xss( sessionFormData.content)
+  sessionFormData.timeSlot = xss( sessionFormData.timeSlot)
+  sessionFormData.date  = xss(sessionFormData.date)
   const senderName = req.session.user.username;
   const coursesList = await userData.getCoursesbyUserName(senderName);
   const userList = await userData.getAllUsers();
@@ -125,7 +129,8 @@ router.route('/:username/received').get(async (req, res) => {
   }
 });
 router.route('/:username/received/:sessionId').post(async (req, res) => {
-  const status = req.body.action;
+  let status = req.body.action;
+  status = xss(status);
   const username = req.params.username;
   const sessionId = req.params.sessionId;
   let errors = []

@@ -1,13 +1,11 @@
 <main>
-    <h2>View All Posts</h2>
+    <h2>View All My Posts</h2>
     <ul>
-        {{#each posts}}
+        {{#each postList}}
         <li>
-            <a href="/posts/{{this._id}}">
                 <h3>{{this.title}}</h3>
             </a>
             <p>{{this.content}}</p>
-            <p>Posted By: {{this.userId}}</p>
             <p>Tags: {{this.tags}}</p>
         </li>
         {{/each}}
