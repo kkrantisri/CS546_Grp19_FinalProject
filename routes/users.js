@@ -1,6 +1,6 @@
 import {Router} from 'express';
 const router = Router();
-import { addUser, getUserById, getUserByUsername, getUserByEmail, getAllUsers, updateUser, getCoursesbyUserName, getReviewsForUser, addReviewToUser , deleteUserById , createreviewbyuserid } from '../data/users.js';
+import { addUser, getUserById, getUserByUsername, getUserByEmail, getAllUsers, updateUser, getCoursesbyUserName, getReviewsForUser , deleteUserById , createreviewbyuserid } from '../data/users.js';
 import {postData, userData} from '../data/index.js';
 import  { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid, checkUsername } from '../helper.js';
 
@@ -95,26 +95,7 @@ router.get('/:id', async (req, res) => {
           console.error('Error:', error.message);
           res.status(500).render('error', { message: 'Internal Server Error' });
         }
-      }).delete(async (req, res) => {
-        const user = req.session.user;
-        const userId =user._id.toString();
-        try{
-          userId = checkId(userId,'userId');
-        }catch(e){
-          res.status(400).render('deleteUser', {message : e})
-        }
-        try{
-          const deleted = await deleteUserById(userId);
-          if(deleted.success === true){
-            req.session.destroy((err) => {
-              res.redirect('/login') 
-            })
-          }
-        }
-        catch(e){
-          res.status(404).render('deleteUser',{message : e})
-        }
-      }); 
+      });
 router.route("/:id/reviews")
   .post(async (req, res) => {
     var user = req.session.user;
@@ -132,12 +113,37 @@ router.route("/:id/reviews")
     }
     try{
       const review = await createreviewbyuserid(userId, reviewerId , body.review ,body.rating);
-      if(review.updated === true){
-        res.redirect(`/users/:${userId}`)
+      if(review.reviewexist === true){
+        res.status(200).render('users/userDetails',{message : 'Your review already exists' , user : await getUserById(userId)})
       }
+      if(review.reviewexist === false){
+        res.redirect(`/users/${userId}`)
+      }
+      
     }catch(e){
       res.status(404).render('users/userDetails',{message : e})
     }
   
 });
+router.route("/delete").post(async (req, res) => {
+  const user = req.session.user;
+  var userId =user.id.toString();
+  try{
+    userId = checkId(userId,'userId');
+  }catch(e){
+    res.status(400).render('users/deleteUser', {message : e})
+  }
+  try{
+    const deleted = await deleteUserById(userId);
+    if(deleted.success === true){
+      req.session.destroy((err) => {
+        res.status(200).render('users/deleteUser', {message : "succesfully deleted!!"})
+  
+      })
+    }
+  }
+  catch(e){
+    res.status(404).render('users/deleteUser',{message : e})
+  }
+}); 
 export default router;

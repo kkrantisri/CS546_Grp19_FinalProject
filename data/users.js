@@ -84,11 +84,11 @@ export const addUser = async (userData) => {
 };
 export const deleteUserById = async (userId) => {
   const validatedUserId = checkId(userId, 'userId');
-  const user = await userCollection.findOne({ _id: ObjectId(validatedUserId) });
+  const user = await userCollection.findOne({ _id: new ObjectId(validatedUserId) });
   if (!user) {
     throw 'User not found with the given id.';
   }
-  const deletionInfo = await userCollection.deleteOne({ _id: ObjectId(validatedUserId) });
+  const deletionInfo = await userCollection.deleteOne({ _id: new ObjectId(validatedUserId) });
   if (deletionInfo.deletedCount === 0) {
     throw 'Failed to delete user.';
   }
@@ -237,29 +237,38 @@ export const getCoursesbyUserName = async (username) =>{
   return coursesObj.coursesEnrolled;
 
 }
-export const createreviewbyuserid = async(userId , reviewId , review , rating) => {
+export const createreviewbyuserid = async (userId, reviewId, review, rating) => {
   const validatedUserId = checkId(userId);
   const validatedReviewerId = checkId(reviewId);
-  const reviewerUsername = await getUserByUsername(validatedReviewerId);
-  const user = await userCollection.findOne({_id : new ObjectId(validatedUserId)});
-  if(!user){
-    throw 'Error : User not found'
+  const currentUser = await getUserById(userId);
+  const user = await userCollection.findOne({ _id: new ObjectId(validatedUserId) });
+
+  if (!user) {
+    throw 'Error: User not found';
   }
+
+  // Check if review by reviewerId already exists
+  const existingReview = user.reviews.find(
+    (review) => review.reviewId === validatedReviewerId
+  );
+
+  if (existingReview) {
+    return {reviewexist : true , user : currentUser};
+  }
+
   user.reviews.push({
-    reviewId : validatedReviewerId,
-    reviewerUsername: reviewerUsername,
-    review : review,
-    rating : rating
+    reviewId: validatedReviewerId,
+    review: review,
+    rating: rating
   });
 
   await userCollection.updateOne(
     { _id: new ObjectId(validatedUserId) },
     { $set: { reviews: user.reviews } }
   );
-  return user;
-
-
-}
+  
+  return {user : user , reviewexist  : false };
+};
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // OPTIONAL
@@ -305,29 +314,7 @@ export const createreviewbyuserid = async(userId , reviewId , review , rating) =
 // REVIEWS data functions
 
 // 1. Add review to User
-export const addReviewToUser = async (userId, reviewerId, reviewText, rating) => {
-  if (!userId || !reviewerId || !reviewText || typeof rating !== 'number') {
-    throw new Error('Invalid input parameters for adding a review.');
-  }
 
-  const newReview = {
-    _id: new ObjectId(),
-    reviewerId: ObjectId(reviewerId),
-    review: reviewText,
-    rating: rating
-  };
-
-  const updateInfo = await userCollection.updateOne(
-    { _id: ObjectId(userId) },
-    { $push: { reviews: newReview } }
-  );
-
-  if (!updateInfo.matchedCount || !updateInfo.modifiedCount) {
-    throw new Error('Failed to add review to user!');
-  }
-
-  return newReview;
-};
 
 
 // 2. Get reviews
@@ -393,6 +380,7 @@ export const loginUser = async (username, password) => {
   }
 
 };
+
 
 // // 3. Update review
 // export const updateReviewForUser = async (userId, reviewId, updatedReview) => {
