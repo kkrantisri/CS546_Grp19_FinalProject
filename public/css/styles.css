@@ -132,7 +132,14 @@ select {
     border-radius: 5px;
     margin-top: 5px;
 }
-
+.like{
+    background-color: green; 
+    width: 7%;
+}
+.dislike{
+    background-color: red; 
+    width: 7%;
+}
 button {
     display: block;
     width: 100%;
