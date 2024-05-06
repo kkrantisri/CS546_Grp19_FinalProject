@@ -257,7 +257,7 @@ export const createreviewbyuserid = async (userId, reviewId, review, rating) => 
   }
 
   user.reviews.push({
-    reviewId: validatedReviewerId,
+    reviewerId: validatedReviewerId,
     review: review,
     rating: rating
   });

@@ -15,7 +15,7 @@ const u1 = {
   languages : ["testst","abccccc"],
   coursesEnrolled : ["abc","abhdh","sjksksk"] ,
   bio : "DSHGGGGGGGKLDGJFJDFSKLJGFIADJKJVNXJGNGVJNFGEKJNVEEMIOVMK HBFDBSJKD ISDJVSKJAN", 
-  gradYear : 2024
+  gradYear : '2024'
 }
 const u2 = {
   username : "vams",
@@ -26,7 +26,7 @@ const u2 = {
   languages : ["testst","abccccc"],
   coursesEnrolled : ["abc","abhdh","sjksksk"] ,
   bio : "DSHGGGGGGGKLDGJFJDFSKLJGFIADJKJVNXJGNGVJNFGEKJNVEEMIOVMK HBFDBSJKD ISDJVSKJAN", 
-  gradYear : 2024
+  gradYear : '2024'
 }
 const u3 = {
   username : "kranti",
@@ -37,7 +37,7 @@ const u3 = {
   languages : ["testst","abccccc"],
   coursesEnrolled : ["abc","abhdh","sjksksk"] ,
   bio : "DSHGGGGGGGKLDGJFJDFSKLJGFIADJKJVNXJGNGVJNFGEKJNVEEMIOVMK HBFDBSJKD ISDJVSKJAN", 
-  gradYear : 2023
+  gradYear : '2023'
 }
 
 const praneeth = await addUser(u1);

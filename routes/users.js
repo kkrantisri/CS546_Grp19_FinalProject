@@ -3,7 +3,7 @@ const router = Router();
 import { addUser, getUserById, getUserByUsername, getUserByEmail, getAllUsers, updateUser, getCoursesbyUserName, getReviewsForUser , deleteUserById , createreviewbyuserid } from '../data/users.js';
 import {postData, userData} from '../data/index.js';
 import  { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid, checkUsername } from '../helper.js';
-
+import xss from 'xss';
 
 router.route('/')
   .get(async (req, res) => {
@@ -26,6 +26,7 @@ router.route('/edit')
           var user = req.session.user;
           var userId = user.id.toString();
           var updatedUserData = req.body;
+
           const userr = await getUserById(userId);
           try{
             userId = checkId(userId,'userId');
@@ -36,30 +37,39 @@ router.route('/edit')
           }
             const { username, password, email, fullName, major, languages, coursesEnrolled, bio, gradYear } = updatedUserData;
           if (updatedUserData.hasOwnProperty("username")) {
+            username = xss(username)
             var validatedUsername = checkUsername(username, 'username');
           }
           if (updatedUserData.hasOwnProperty("email")) {
+            email = user(email)
             var validatedEmail = checkEmail(email, 'email');
           }
           if (updatedUserData.hasOwnProperty("password")) {
+            password = xss(password)
             var validatedPassword = checkPassword(password);
           }
           if (updatedUserData.hasOwnProperty("fullName")) {
+            fullName = xss(fullName)
             var validatedFullName = checkString(fullName, 'fullName');
           }
           if (updatedUserData.hasOwnProperty("major")) {
+            major = xss(major)
             var validatedMajor = checkString(major, 'major');
           }
           if (updatedUserData.hasOwnProperty("languages")) {
+            languages = xss(languages)
             var validatedLanguages = checkPassword(languages);
           }
           if (updatedUserData.hasOwnProperty("coursesEnrolled")) {
+            coursesEnrolled = xss(coursesEnrolled)
             var validatedCoursesEnrolled = checkStringArray(coursesEnrolled, 'coursesEnrolled');
           }
           if (updatedUserData.hasOwnProperty("bio")) {
+            bio = xss(bio)
             var validatedBio = checkString(bio, 'bio');
           }
           if (updatedUserData.hasOwnProperty("gradYear")) {
+            gradYear = xss(gradYear)
             var validatedGradYear = checkString(gradYear, 'gradYear');
           }
           }catch(e){
@@ -76,7 +86,9 @@ router.route('/edit')
         });
 router.get('/:id', async (req, res) => {
         try {
-          const user =  await getUserById(req.params.id);
+          var id = req.params.id;
+          id = checkId(id);
+          const user =  await getUserById(id);
           
           const UserId = req.session.user;
           const loggedInUserId = UserId.id;
@@ -102,6 +114,8 @@ router.route("/:id/reviews")
     var reviewerId = user.id.toString();
     var userId = req.params.id;
     const body = req.body;
+    body.review = xss(body.review);
+    body.rating = xss(body.rating);
     try{
       reviewerId = checkId(reviewerId,'reviewerId');
       userId = checkId(userId , 'userId');
