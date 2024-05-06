@@ -99,28 +99,28 @@ router
       res.status(404).json({error: e});
     }
   })
-  .post(async (req, res) => {
-    const postId = req.params.id;
-    const userId = req.session.user.userId;
-    const userName = req.session.user.userName;
-    const content = req.body;
-    try {
-      postId =  checkId(postId, 'Post ID');
-      userId =  checkId(userId, 'User ID');
-      userName =  checkUsername(userName, 'User Name');
-      content =  checkString(content, 'Content');
-      const postList = await postData.getPostById(postId);
-      if(!postList){
-        throw 'Error : Post Not Found'
-      }
-      const newComment = await postData.createComment(postId, userId, userName, content);
-      if(newComment.commentCompleted === true){
-        res.render('postDetails', {message : 'Sucessfully added the comment!!'});
-      }
-    } catch (e) {
-      res.status(400).json({error: e});
-    }
-  })
+  // .post(async (req, res) => {
+  //   const postId = req.params.id;
+  //   const userId = req.session.user.userId;
+  //   const userName = req.session.user.userName;
+  //   const content = req.body;
+  //   try {
+  //     postId =  checkId(postId, 'Post ID');
+  //     userId =  checkId(userId, 'User ID');
+  //     userName =  checkUsername(userName, 'User Name');
+  //     content =  checkString(content, 'Content');
+  //     const postList = await postData.getPostById(postId);
+  //     if(!postList){
+  //       throw 'Error : Post Not Found'
+  //     }
+  //     const newComment = await postData.createComment(postId, userId, userName, content);
+  //     if(newComment.commentCompleted === true){
+  //       res.render('postDetails', {message : 'Sucessfully added the comment!!'});
+  //     }
+  //   } catch (e) {
+  //     res.status(400).json({error: e});
+  //   }
+  // })
   .patch(async (req, res) =>{
     const postId = req.params.id;
     const updatedPostData = req.body;
@@ -346,4 +346,35 @@ router
     }
 
   });
+  
+ router.route('/:id/comment/').post(async(req,res)=>{
+  const postId = req.params.id;
+  const userId = req.session.user.id;
+  const userName = req.session.user.username;
+  const content = req.body.comment;
+  try {
+    const check = await postData.createComment(postId,userId,userName,content);
+    if(check.commentCompleted){
+      res.status(200).json({content:check.content,userId:userId,userName:userName})
+    }else{
+      res.status(500).json({error:"Internal Server Error"});
+    }
+  } catch (error) {
+    res.status(404).json({error:error});
+  }
+
+
+ });
+
+ router.route('/:id/comment/').get(async(req,res)=>{
+  //const postId = req.params.id;
+  try {
+    const post = await postData.getPostById(req.params.id);
+    res.status(200).render('posts/addComment',{post:post});
+  } catch (error) {
+    res.status(404).json({error:error});
+  }
+
+
+ });
 export default router;

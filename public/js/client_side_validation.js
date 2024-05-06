@@ -185,6 +185,23 @@ $(document).ready(function() {
       const $button = $(this);
       const postId = $(this).attr('data-post-id');
       const action = $(this).attr('data-state');
+      const $dislikeButton = $button.siblings('.dislike');
+      const dislikeAction = $dislikeButton.attr('data-state');
+      if (dislikeAction === 'undislike'){
+        let requestConfig = {
+          method: 'POST',
+          url: `/posts/${postId}/dislikes`,
+          contentType: 'application/json',
+          data: JSON.stringify({
+            action: dislikeAction,
+          })
+        };
+        $.ajax(requestConfig).then(function(response){
+          $dislikeButton.siblings('.dislikes-count').text(response.dislikesCount);
+          $dislikeButton.text('dislike')
+          $dislikeButton.attr('data-state', 'dislike');
+        })
+      }
       let requestConfig = {
           method: 'POST',
           url: `/posts/${postId}/likes`,
@@ -210,6 +227,23 @@ event.preventDefault();
 const $button = $(this);
 const postId = $(this).attr('data-post-id');
 const action = $(this).attr('data-state');
+const $likeButton = $button.siblings('.like');
+const likeAction = $likeButton.attr('data-state');
+if (likeAction === 'unlike'){
+  let requestConfig = {
+    method: 'POST',
+    url: `/posts/${postId}/likes`,
+    contentType: 'application/json',
+    data: JSON.stringify({
+      action: likeAction,
+    })
+  };
+  $.ajax(requestConfig).then(function(response){
+    $likeButton.siblings('.likes-count').text(response.likesCount);
+    $likeButton.text('like')
+    $likeButton.attr('data-state', 'like');
+  })
+}
 let requestConfig = {
     method: 'POST',
     url: `/posts/${postId}/dislikes`,
@@ -254,6 +288,32 @@ $.ajax(requestConfig).then(function (response) {
 
 
 });
+
+$('#submitButton').on('click', function () {
+  var comment = $("#commentBox").val();
+  var postId = $(this).data('post-id');
+  if (comment.trim() !== "") {
+      let requestConfig = {
+          method: 'POST',
+          url: `/posts/${postId}/comment`,
+          contentType: 'application/json',
+          data: JSON.stringify({
+              comment: comment,
+          })
+      };
+      $.ajax(requestConfig).then(function (response) {
+          let element = $(
+              `<li>
+                  <h2>${response.content}</h2>
+                  <h5>Commented By <a href="/users/${response.userId}">${response.userName}</a></h5>
+              </li>`
+          );
+          $('#comment-list').append(element);
+          $("#commentBox").val(''); 
+      });
+  }
+});
+
 
   
 });
