@@ -23,7 +23,19 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(rewriteUnsupportedBrowserMethods);
 
-app.engine('handlebars', exphbs.engine({defaultLayout: 'main'}));
+app.engine('handlebars', exphbs.engine({defaultLayout: 'main',helpers:{userLikedPost:function(post,user,options){
+  if (post.likedBy.includes(user)){
+    return options.fn(this);
+  }else{
+    return options.inverse(this);
+  }
+},userDislikedPost:function(post,user,options){
+  if (post.dislikedBy.includes(user)) {
+    return options.fn(this);
+  } else {
+    return options.inverse(this);
+  }
+}}}));
 app.set('view engine', 'handlebars');
 app.use(
   session({
@@ -33,6 +45,31 @@ app.use(
     saveUninitialized: false
   })
 );
+// app.use('/',(req , res , next) => {
+//   const currentTimestamp  = new Date().toUTCString();
+//   var authenticateStatus = "";
+//   if(req.session.user){
+//       authenticateStatus = "Authenticated User"
+//   }
+//   else{
+//       authenticateStatus = "Non - Authenticated User"
+//   }
+
+//   console.log(`[${currentTimestamp}] : ${req.method} ${req.originalUrl} (${authenticateStatus})`)
+//   if(req.path === '/'){
+//   if(req.session.user){
+
+//       if(req.session.user.role === 'user'){
+//           return res.redirect('/posts')
+//       }
+//   } else {
+//       return res.redirect('/login')
+//   }
+//   } 
+//   else{
+//       next();  
+//   }})
+
 configRoutes(app);
 
 app.listen(3000, () => {

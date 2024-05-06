@@ -6,7 +6,6 @@
                 <label for="username">Username:</label><br>
                 <input type="text" id="username" name="username" required><br>
             </div>
-
             <div class="password-container">
                 <label for="password">Password:</label><br>
                 <input type="password" id="password" name="password" required><br>
@@ -16,20 +15,32 @@
                 <label for="email">Email:</label><br>
                 <input type="email" id="email" name="email" required><br>
             </div>
-
             <div class="fullname-container">
                 <label for="fullname">Full Name:</label><br>
                 <input type="text" id="fullname" name="fullname" required><br>
             </div>
-
             <div class="major-container">
-                <label for="major">Major:</label><br>
-                <input type="text" id="major" name="major" required><br>
+            <label for="major">Major:</label><br>
+                <select id="major" name="major" required>
+                    <option value="Computer Science">Computer Science</option>
+                    <option value="Software Engineering">Software Engineering</option>
+                    <option value="Financial Engineering">Financial Engineering</option>   
+                </select>
             </div>
-
             <div class="languages-container">
-                <label for="languages">Languages:</label><br>
-                <input type="text" id="languages" name="languages" required><br>
+                <label for="languages">languages:</label><br>
+                <select id="languages" name="languages[]" multiple required>
+                    <option value="Hindi">Hindi</option>
+                    <option value="English">English</option>
+                    <option value="Telugu">Telugu</option>
+                    <option value="Tamil">Tamil</option>
+                    <option value="Gujrati">Gujrati</option>
+                    <option value="Marathi">Marathi</option>
+                </select>
+            </div>            
+            <div class="selected-languages">
+                <label for="selectedlanguages">Selected Languages:</label><br>
+                <textarea id="selectedlanguages" rows="4" cols="50" readonly></textarea>
             </div>
 
             <div class="coursesEnrolled-container">
@@ -52,18 +63,18 @@
             <script>
                 const coursesEnrolledSelect = document.getElementById("coursesEnrolled");
                 const selectedCoursesTextarea = document.getElementById("selectedCourses");
-
-                // Event listener to update the textbox when selection changes
+                const selectedlanguages = document.getElementById("selectedlanguages");
+                const languagesSelect = document.getElementById("languages");
+                  languagesSelect.addEventListener("change", function () {
+                    const selectedOptions = Array.from(this.selectedOptions).map(option => option.text);
+                    selectedlanguages.value = selectedOptions.join("\n");
+                });
                 coursesEnrolledSelect.addEventListener("change", function () {
                     const selectedOptions = Array.from(this.selectedOptions).map(option => option.text);
                     selectedCoursesTextarea.value = selectedOptions.join("\n");
                 });
             </script>
 
-            <div class="reviews-container">
-                <label for="reviews">Reviews:</label><br>
-                <input type="text" id="reviews" name="reviews"><br>
-            </div>
 
             <div class="bio-container">
                 <label for="bio">Bio:</label><br>
@@ -78,10 +89,11 @@
             <button type="submit">Sign Up</button>
         </form>
     </div>
+      <p>Already a member? <a href="/login">Click here to login</a></p>
     <div class="msg">
         {{#if hasMessage}}
-
-        <p>{{message}} <a href="/login">Click here to login!</a></p>
+         <p class="">{{message}}</p>
+        <p class="success">{{success}} <a href="/login">Click here to login!</a></p>
         {{/if}}
         {{#if haspostNotFoundErrors}}
         <h1>{{error}}</h1>

@@ -9,7 +9,7 @@ async function updatePendingSessions() {
 
   for (const session of pendingSessions) {
     if(! isTimeSlotValid(session.timeSlot,session.date))
-    await sessionCollection.updateOne({ _id: session._id }, { $set: { status: "noResponse" } });
+    await sessionCollection.updateOne({ _id: session._id }, { $set: { status: "noResponse",checker:false } });
   }
 }
 
@@ -17,7 +17,7 @@ export const getAllReceivedSessions = async (username) => {
   username =  checkString(username,'username');
   await updatePendingSessions();
   const userCollection = await users()
-  userFound = await userCollection.findOne({username:username});
+  const userFound = await userCollection.findOne({username:username});
   if(!userFound){
     throw 'User not Found'
   }
@@ -30,7 +30,7 @@ export const getAllSentSessions = async(username) =>{
   username =  checkString(username,'username');
   await updatePendingSessions();
   const userCollection = await users()
-  userFound = await userCollection.findOne({username:username});
+  const userFound = await userCollection.findOne({username:username});
   if(!userFound){
     throw 'User not Found'
   }
@@ -77,7 +77,8 @@ export const createSession = async (course,content,senderName,receiverName,date,
     receiverName : receiverName,
     date : date,
     timeSlot : timeSlot,
-    status : "pending"
+    status : "pending",
+    checker : true
   }
   const insertInfo = await sessionCollection.insertOne(newSession);
   if (!insertInfo.acknowledged || !insertInfo.insertedId){
@@ -102,11 +103,11 @@ export const updateSessionPatch=async(sessionId,username,status) =>{
     throw 'No user with that username'
   }
   if(!sessionCheck) throw 'No session with sessionId'
-  const updatedSession = await sessionCollection.findOneAndUpdate({_id : new ObjectId(sessionId)},{$set:{status:status}},{returnDocument:'after'});
+  const updatedSession = await sessionCollection.findOneAndUpdate({_id : new ObjectId(sessionId)},{$set:{status:status,checker:false}},{returnDocument:'after'});
   if(!updatedSession){
     throw 'Session not updated';
   }
-  const succ = {sessionUpdated : true,status:updatedSession.status}
+  const succ = {sessionUpdated : true,status:updatedSession.value.status}
   return succ;
   // const updatedReceivedSessions = await sessionCollection.find({$and:[{receiverName : username },{status: { $in: ['accepted', 'pending'], $ne: 'rejected' }}]}).toArray();
   // return updatedReceivedSessions;

@@ -8,7 +8,28 @@ const checkId = (id, varName) => {
   if (!ObjectId.isValid(id)) throw `Error: ${varName} invalid object ID`;
   return id;
 };
-
+const checkPassword = (password) => {
+  password = password.trim();
+  if (!password || typeof password !== 'string') {
+    throw new Error('Password must be provided as a string.');
+  }
+  if (password.length < 8) {
+    throw new Error('Password must be at least 8 characters long.');
+  }
+  if (!/[A-Z]/.test(password)) {
+    throw new Error('Password must contain at least one uppercase letter.');
+  }
+  if (!/[!@#$%^&*()\-+={}[\]:;"'<>,.?\/|\\]/.test(password)) {
+    throw new Error('Password must contain at least one special character.');
+  }
+  return password;
+};
+const checkUsername = (value, fieldName) => {
+  if (typeof value !== 'string' || value.trim().length === 0 || /\d/.test(value)) {
+    throw new Error(`Invalid ${fieldName}.`);
+  }
+  return value.trim();
+};
 const checkString = (strVal, varName) => {
   if (!strVal) throw `Error: You must supply a ${varName}!`;
   if (typeof strVal !== 'string') throw `Error: ${varName} must be a string!`;
@@ -136,5 +157,5 @@ const isTimeSlotValid = (selectedTimeSlot, dateString) => {
   }
 };
 
-export { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid };
+export { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid , checkPassword , checkUsername};
 

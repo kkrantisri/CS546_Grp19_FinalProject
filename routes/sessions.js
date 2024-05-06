@@ -31,7 +31,7 @@ router.route('/').post(async (req, res) => {
     errors.push(error)
   }
   try {
-    sessionFormData.date =  checkRating(sessionFormData.date, 'date')
+    sessionFormData.date =  checkString(sessionFormData.date, 'date')
   } catch (error) {
     errors.push(error);
   }
@@ -54,11 +54,11 @@ router.route('/').post(async (req, res) => {
   } catch (error) {
     errors.push(error)
   }
-  try {
-    senderName =  checkString(senderName, 'senderName');
-  } catch (error) {
-    errors.push(error)
-  }
+  // try {
+  //   senderName =  checkString(senderName, 'senderName');
+  // } catch (error) {
+  //   errors.push(error)
+  // }
   try {
     if (senderName === sessionFormData.receiverName) {
       throw "You cannot Schedule a session with yourself!!"
@@ -88,7 +88,7 @@ router.route('/').post(async (req, res) => {
     //const userId = req.session.user.userId
     //const coursesList = await userData.getCoursesbyUserId(userId);
     //const userList = await userData.getAllUsers();
-    res.status(400).render('sessions/createSession', { users: userList, courses: coursesList, sessions: sessionFormData, errors: e, hasErrors: true });
+    res.status(400).render('sessions/createSession', { users: userList, courses: coursesList, sessions: sessionFormData, error: e, hasDbErrors: true });
     return;
 
   }
@@ -124,26 +124,26 @@ router.route('/:username/received').get(async (req, res) => {
     return;
   }
 });
-router.route('/:username/received/:sessionId').patch(async (req, res) => {
+router.route('/:username/received/:sessionId').post(async (req, res) => {
   const status = req.body.action;
   const username = req.params.username;
   const sessionId = req.params.sessionId;
   let errors = []
-  try {
-    status =  checkString(status, 'status');
-  } catch (e) {
-    errors.push(e)
-  }
-  try {
-    username =  checkString(username, 'username');
-  } catch (e) {
-    errors.push(e)
-  }
-  try {
-    sessionId =  checkId(sessionId, 'sessionId')
-  } catch (e) {
-    errors.push(e)
-  }
+  // try {
+  //   status =  checkString(status, 'status');
+  // } catch (e) {
+  //   errors.push(e)
+  // }
+  // try {
+  //   username =  checkString(username, 'username');
+  // } catch (e) {
+  //   errors.push(e)
+  // }
+  // try {
+  //   sessionId =  checkId(sessionId, 'sessionId')
+  // } catch (e) {
+  //   errors.push(e)
+  // }
   try {
     if (status !== "accepted" && status !== "rejected") {
       throw 'Status should be either accepted or rejected'

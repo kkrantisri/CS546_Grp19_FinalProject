@@ -9,6 +9,8 @@ import {
   checkRating,
   isValidDate,
   isTimeSlotValid,
+  checkPassword,
+  checkUsername,
 } from "../helper.js";
 import bcrypt from "bcrypt";
 const router = Router();
@@ -33,14 +35,13 @@ router
   .post(async (req, res) => {
     try {
       let { username, password, email, fullname, major, languages, coursesEnrolled, reviews, bio, gradyear } = req.body;
-      const validatedUsername =  checkString(username, 'username');
-      const validatedPassword =  checkString(password, 'password');
+      const validatedUsername =  checkUsername(username, 'username');
+      const validatedPassword =  checkPassword(password);
       const validatedEmail =  checkEmail(email);
       const validatedFullName =  checkString(fullname, 'fullName');
       const validatedMajor =  checkString(major, 'major');
-      languages = languages.split(',');
       const validatedLanguages =  checkStringArray(languages, 'languages');
-      coursesEnrolled = coursesEnrolled.split(',');
+      //coursesEnrolled = coursesEnrolled.split(',');
       const validatedCoursesEnrolled =  checkStringArray(coursesEnrolled, 'coursesEnrolled');
       const validatedBio =  checkString(bio, 'bio');
       //const validatedGradYear =  checkPositiveNumber(gradyear, 'gradYear');
@@ -107,13 +108,11 @@ router
     try{
       const {username,password} = userData
       const check = await loginUser(username,password)
-  //     req.session.user = {firstName : check.firstName,
-  //     lastName : check.lastName,
-  //   username : check.username,favoriteQuote:check.favoriteQuote,
-  // themePreference:check.themePreference,role:check.role}
-      // if(check.role==="admin"){
-      //   res.status(200).redirect('/admin')
-      // }
+      req.session.user = {id:check._id,username : check.username,
+      fullName : check.fullName,
+    coursesEnrolled : check.coursesEnrolled}
+
+      //const tp = req.session.user.id.toString();
       
       res.status(200).redirect('/posts')
       

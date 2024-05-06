@@ -1,5 +1,5 @@
 <article class="new-session">
-  <h1>Scgedule a Session</h1>
+  <h1>Schedule a Session</h1>
   <form action="/sessions" method="POST" class="new-session-form">
     <label for="course">
       Course Name
@@ -69,6 +69,16 @@
     </li>
     {{/each}}
   </ul>
+  {{/if}}
+
+  {{#if hasDbErrors}}
+  <ul class="error-list">
+    <li>
+      {{error}}
+    </li>
+
+  </ul>
+
   {{/if}}
 
 </article>

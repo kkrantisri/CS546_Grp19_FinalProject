@@ -1,71 +1,23 @@
 <main>
-    <div class="signup-page">
-        <h2>Edit Profile</h2>
-        <form action="/users/editProfile" method="POST">
-            <div class="username-container">
-                <label for="username">Username:</label><br>
-                <input type="text" id="editUsername" name="username" required value="{{userInfo.username}}"><br>
-            </div>
-
-            <div class="password-container">
-                <label for="password">Password:</label><br>
-                <input type="password" id="password" name="password" required><br>
-            </div>
-
-            <div class="email-container">
-                <label for="email">Email:</label><br>
-                <input type="email" id="editEmail" name="email" required value="{{userInfo.email}}"><br>
-            </div>
-
-            <div class="fullname-container">
-                <label for="fullname">Full Name:</label><br>
-                <input type="text" id="editFullname" name="fullname" required value="{{userInfo.fullname}}"><br>
-            </div>
-
-            <div class="major-container">
-                <label for="major">Major:</label><br>
-                <input type="text" id="editMajor" name="major" required value="{{userInfo.major}}"><br>
-            </div>
-
-            <div class="languages-container">
-                <label for="languages">Languages:</label><br>
-                <input type="text" id="editLanguages" name="languages" required value="{{userInfo.languages}}"><br>
-            </div>
-
-            <div class="coursesEnrolled-container">
-                <label for="coursesEnrolled">Courses Enrolled:</label><br>
-                <div class="selected-courses">
-                    <label for="selectedCourses">Selected Courses:</label><br>
-                    <textarea id="selectedCourses" rows="4" cols="50" readonly></textarea>
-                </div>
-
-                <script>
-                    const coursesEnrolledSelect = document.getElementById("coursesEnrolled");
-                    const selectedCoursesTextarea = document.getElementById("selectedCourses");
-
-                    // Event listener to update the textbox when selection changes
-                    coursesEnrolledSelect.addEventListener("change", function () {
-                        const selectedOptions = Array.from(this.selectedOptions).map(option => option.text);
-                        selectedCoursesTextarea.value = selectedOptions.join("\n");
-                    });
-                </script>
-
-                <div class="reviews-container">
-                    <label for="reviews">Reviews:</label><br>
-                    <input type="text" id="editReviews" name="reviews" value="{{userInfo.reviews}}"><br>
-                </div>
-
-                <div class="bio-container">
-                    <label for="bio">Bio:</label><br>
-                    <textarea id="editBio" name="bio" rows="4" cols="50">{{userInfo.bio}}</textarea><br>
-                </div>
-
-                <div class="gradyear-container">
-                    <label for="gradyear">Graduation Year:</label><br>
-                    <input type="text" id="editGradyear" name="gradyear" required value="{{userInfo.gradyear}}"><br>
-                </div>
-
-                <button type="submit">Update Profile</button>
-        </form>
-    </div>
+    <h2>Edit User</h2>
+    <form action="/users/edit" method="POST">
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username" value="{{user.username}}" ><br>
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" value="{{user.email}}" ><br>
+        <label for="fullname">Full Name:</label><br>
+        <input type="text" id="fullname" name="fullname" value="{{user.fullName}}" ><br>
+        <label for="bio">Bio:</label><br>
+        <textarea id="bio" name="bio" rows="4">{{user.bio}}</textarea><br>
+        <label for="gradyear">Graduation Year:</label><br>
+        <input type="text" id="gradyear" name="gradyear" value="{{user.gradyear}}" ><br>
+        <label for="major">Major:</label><br>
+        <input type="text" id="major" name="major" value="{{user.major}}" ><br>
+        <button type="submit">Save Changes</button>
+    </form>
+    <button onclick="history.back()">Go Back</button>
+    {{#if hasErrors}}
+    <p>{{error}}</p>
+    {{/if}}
 </main>
+
