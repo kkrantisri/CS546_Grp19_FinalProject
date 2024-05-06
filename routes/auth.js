@@ -27,7 +27,7 @@ router
   .route("/register")
   .get(async (req, res) => {
     try {
-      res.status(200).render("signup", { title: "Signup Page" });
+      res.status(200).render("signup", { title: "Duckpal" });
     } catch (error) {
       res.status(500).json({ error: "Internal Server Error" });
     }
@@ -70,7 +70,7 @@ router
   .route("/login")
   .get(async (req, res) => {
     try {
-      res.status(200).render("login", { title: "Login Form" });
+      res.status(200).render("login", { title: "Welcome to Duckpal" });
     } catch (error) {
       res.status(500).json({ error: "Internal Server Error" });
     }
