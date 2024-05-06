@@ -41,8 +41,6 @@ router
       email = xss(email);
       fullname = xss(fullname);
       major = xss(major);
-      languages = xss(languages);
-      coursesEnrolled = xss(coursesEnrolled);
       bio = xss(bio);
       gradyear = xss(gradyear);
       const validatedUsername =  checkUsername(username, 'username');
@@ -71,7 +69,8 @@ router
       res.status(200).render('signup', { message: 'Successfully Registered. You can login now.',hasMessage:true });
     } catch (error) {
       res.status(400).render("signup", {
-        message: error.message || "Error: Internal Server Error",
+        message: error,
+        hasMessage : true,
         title: "Signup Form",
       });
     }

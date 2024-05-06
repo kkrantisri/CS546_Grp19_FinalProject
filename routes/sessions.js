@@ -129,7 +129,7 @@ router.route('/:username/received').get(async (req, res) => {
   }
 });
 router.route('/:username/received/:sessionId').post(async (req, res) => {
-  const status = req.body.action;
+  let status = req.body.action;
   status = xss(status);
   const username = req.params.username;
   const sessionId = req.params.sessionId;
