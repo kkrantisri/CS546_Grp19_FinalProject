@@ -13,4 +13,12 @@ Once the server is running, navigate to localhost:3000 to launch our website.
 
 Login to an account : username : praneeth , password  : Jack$Jill1124
 
-Some Features of our web application :  Create Post For Help with academics , Schedule Study Sessions , Like Dislike Posts  , Leave Reviews For Other Users and more!!.
+Some Features of our web application :  
+A)  1)CRUD operations on both user profiles and posts
+    2)Leave review and rating to other user(Max 1)
+    3)Comment on posts
+    4)Like and dislike system.
+B)  1)Schedule Study Sessions
+    2)View your Sent Requests, updating the status accordingly once the status got changed 
+C)  1)View your Received requests(Only displaying pending and accepted since no point of watching the session which he/she already rejected)
+    2)Enables user to 'Accept' or 'Reject' requests based on his/her availability)
