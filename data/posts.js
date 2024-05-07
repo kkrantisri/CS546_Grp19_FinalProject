@@ -110,10 +110,10 @@ export const deletePost = async (id) => {
   return {deleted: true};
 };
 export const createComment = async (postId,userId,userName,content) =>{
-  postId =  checkId(postId,'postId')
-  userId =  checkId(userId,'userId')
-  userName =  checkUsername(userName,'userName')
-  content =  checkString(content,'content')
+   postId =  checkId(postId,'postId')
+   userId =  checkId(userId,'userId')
+   userName =  checkUsername(userName,'userName')
+   content =  checkString(content,'content')
   const postCollection = await posts()
   const post = await postCollection.findOne({_id: new ObjectId(postId)});
   if(post === null){
@@ -133,11 +133,11 @@ export const createComment = async (postId,userId,userName,content) =>{
     content : content,
     postedAt : postedAt
   }
-  const updateInfo = await postCollection.updateOne({_id: new ObjectId(postId)}, {$push: {comments: newReview}},{returnDocument:'after'});
+  const updateInfo = await postCollection.updateOne({_id: new ObjectId(postId)}, {$push: {comments: newComment}},{returnDocument:'after'});
   if(!updateInfo){
     throw `Error: Update failed! Could not add the comment for the post with postId ${postId}`;
   }
-  return {commentCompleted : true};
+  return {commentCompleted : true,content:content};
 
 };
 export const getAllComments = async (postId) =>{
