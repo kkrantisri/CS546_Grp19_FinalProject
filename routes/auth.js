@@ -122,7 +122,7 @@ router
       const check = await loginUser(username,password)
       req.session.user = {id:check._id,username : check.username,
       fullName : check.fullName,
-    coursesEnrolled : check.coursesEnrolled}
+    coursesEnrolled : check.coursesEnrolled,role:check.role}
 
       //const tp = req.session.user.id.toString();
       

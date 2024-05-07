@@ -15,6 +15,9 @@ const constructorMethod = (app) => {
   app.get('/contact', (req, res) => {
     res.sendFile(path.resolve('static/contact.html'));
   });
+  app.get('/admin',(req,res)=>{
+    res.sendFile(path.resolve('static/admin.html'));
+  })
   app.use('/public', staticDir('public'));
   app.use('*', (req, res) => {
     res.redirect('/');
