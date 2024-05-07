@@ -38,37 +38,141 @@ app.use(
     saveUninitialized: false
   })
 );
-app.use('/',(req , res , next) => {
-  if(req.path === '/'){
+//MIDDLEWARES
+
+app.use('/',(req,res,next)=>{
+  let str = "["+ new Date().toUTCString()+"]" + " : "+ req.method + " "+ req.originalUrl;
+  //console.log("["+ new Date().toUTCString()+"]" + " : "+ req.method + " "+ req.originalUrl);
   if(req.session.user){
-         res.redirect('/posts')
-  } else {
-      return res.redirect('/login')
+    str+=" Authenticated User"
   }
-  } 
   else{
-      next();  
+    str+=" Non-Authenticated User"
   }
-})
-app.use('/login',(req,res,next) => {
-  if(req.session.user){
-      if(req.session.user.role === "user"){
+  console.log(str)
+  if(req.path==='/'){
+    if(req.session.user){
+      if(req.session.user.role==="admin"){
+        res.redirect('/admin')
+      }
+      else{
         res.redirect('/posts')
       }
+    }
+    else{
+      res.redirect('/login')
+    }
   }
   else{
-  next();
+    next();
   }
-})
-app.use('/register',(req,res,next) => {
-  if(req.session.user){
-    if(req.session.user.role === "user"){
-      res.redirect('/posts')
+  
+
+});
+
+
+
+
+
+app.use('/login',(req,res,next) => {
+  if(req.method==='GET'){
+    if(req.session.user){
+      if(req.session.user.role==='admin'){
+        res.redirect('/admin');
+      }else if(req.session.user.role==='user'){
+        res.redirect('/posts')
       }
+
+    }else{
+      next();
+    }
   }else{
-  next();
+    next();
   }
-})
+  
+});
+app.use('/register',(req,res,next) => {
+  if(req.method==='GET'){
+    if(req.session.user){
+      if(req.session.user.role==='admin'){
+        res.redirect('/admin');
+      }else if(req.session.user.role==='user'){
+        res.redirect('/posts')
+      }
+
+    }else{
+      next();
+    }
+  }else{
+    next();
+  }
+});
+app.use('/posts',(req,res,next)=>{
+  if(req.method==="GET"){
+    if(!req.session.user){
+      res.redirect('/login');
+    }else{
+      next();
+    }
+
+  }else{
+    next();
+  }
+});
+app.use('/admin',(req,res,next)=>{
+  if(req.method==="GET"){
+    if(!req.session.user){
+      res.redirect('/login');
+    }else{
+      if(req.session.user.role!=="admin"){
+        res.redirect('/posts');
+      }else if(req.session.user.role ==="admin"){
+        res.redirect('/admin');
+      }
+
+    }
+
+  }else{
+    next();
+  }
+});
+
+app.get('/logout',(req,res,next)=>{
+  if(!req.session.user){
+    res.redirect('/login')
+  }
+  else{
+    next()
+  }
+});
+
+app.use('/sessions',(req,res,next)=>{
+  if(req.method==="GET"){
+    if(!req.session.user){
+      res.redirect('/login');
+    }else{
+      next();
+    }
+
+  }else{
+    next();
+  }
+});
+app.use('/users',(req,res,next)=>{
+  if(req.method==="GET"){
+    if(!req.session.user){
+      res.redirect('/login');
+    }else{
+      next();
+    }
+
+  }else{
+    next();
+  }
+});
+
+
+
 configRoutes(app);
 
 app.listen(3000, () => {
