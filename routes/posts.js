@@ -314,7 +314,7 @@ router
   router.route('/:id/likes/').post(async(req,res)=>{
     const postId = req.params.id;
     const username = req.session.user.username;
-    const action =req.body.action;
+    let action =req.body.action;
     action = xss(action)
     // let errors = []
     // try {

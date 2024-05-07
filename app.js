@@ -28,7 +28,24 @@ app.engine('handlebars', exphbs.engine({defaultLayout: 'main',helpers:{userLiked
   } else {
     return options.inverse(this);
   }
-}}}));
+},equal:function(val1,val2,options){
+  if (val1 === val2) {
+    return options.fn(this);
+  } else {
+    return options.inverse(this);
+  }
+},isSelectedLanguage: function(language, userLanguages) {
+      if (!Array.isArray(userLanguages)) {
+        return false; // Default to not selected if selectedLanguages is not an array
+    }
+    return userLanguages.includes(language);
+},isSelectedCourse: function(course,coursesEnrolled) {
+      if (!Array.isArray(coursesEnrolled)) {
+        return false; // Default to not selected if selectedLanguages is not an array
+    }
+  return coursesEnrolled.includes(course);
+}
+}}));
 app.set('view engine', 'handlebars');
 app.use(
   session({

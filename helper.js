@@ -11,10 +11,10 @@ const checkId = (id, varName) => {
 const checkPassword = (password) => {
   password = password.trim();
   if (!password || typeof password !== 'string') {
-    throw new Error('Password must be provided as a string.');
+    throw new Error('Password must be provided as a string, at least 8 characters long, must contain at least one uppercase letter, and one special character.');
   }
   if (password.length < 8) {
-    throw new Error('Password must be at least 8 characters long.');
+    throw new Error('Password must be at least 8 characters long, must contain at least one uppercase letter, and one special character.');
   }
   if (!/[A-Z]/.test(password)) {
     throw new Error('Password must contain at least one uppercase letter.');
@@ -25,11 +25,29 @@ const checkPassword = (password) => {
   return password;
 };
 const checkUsername = (value, fieldName) => {
-  if (typeof value !== 'string' || value.trim().length === 0 || /\d/.test(value)) {
+  // Check if value is a string and matches the specified criteria
+  if (typeof value !== 'string' || value.trim().length === 0) {
     throw new Error(`Invalid ${fieldName}.`);
   }
-  return value.trim();
+
+  // Check if the value contains any non-letter characters
+  if (!/^[a-zA-Z]+$/.test(value)) {
+    throw new Error(`Invalid ${fieldName}. ${fieldName} must contain only letters (capital or small).`);
+  }
+
+  // Check if the length of the trimmed value is between 5 and 10 characters
+  const trimmedValue = value.trim();
+  if (trimmedValue.length < 5 || trimmedValue.length > 10) {
+    throw new Error(`${fieldName} must be between 5 and 10 characters long.`);
+  }
+
+  // Convert the username to lowercase
+  const lowercaseUsername = trimmedValue.toLowerCase();
+
+  return lowercaseUsername;
 };
+
+
 const checkString = (strVal, varName) => {
   if (!strVal) throw `Error: You must supply a ${varName}!`;
   if (typeof strVal !== 'string') throw `Error: ${varName} must be a string!`;
@@ -43,7 +61,7 @@ const checkString = (strVal, varName) => {
 
 const checkStringArray = (arr, varName) => {
   if (!arr || !Array.isArray(arr))
-    throw `You must provide an array of ${varName}`;
+    throw `You must provide atleast one ${varName}`;
   for (let i in arr) {
     if (typeof arr[i] !== 'string' || arr[i].trim().length === 0) {
       throw `One or more elements in ${varName} array is not a string or is an empty string`;
@@ -157,5 +175,29 @@ const isTimeSlotValid = (selectedTimeSlot, dateString) => {
   }
 };
 
-export { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid , checkPassword , checkUsername};
+const checkYear = (yearValue, varName) => {
+  // Ensure yearValue is provided and a string
+  if (!yearValue || typeof yearValue !== 'string') {
+    throw new Error(`Invalid ${varName}. Year must be provided as a string.`);
+  }
 
+  // Parse the yearValue as an integer
+  const year = parseInt(yearValue, 10);
+
+  // Check if the parsed year is a valid number
+  if (isNaN(year) || year <= 0) {
+    throw new Error(`Invalid ${varName}. Year must be a positive number.`);
+  }
+
+  // Get the current year
+  const currentYear = new Date().getFullYear();
+
+  // Check if the year is a future year (including the current year)
+  if (year >= currentYear) {
+    return year.toString(); // Return the valid year value
+  } else {
+    throw new Error(`Invalid ${varName}. Year must be the current year or a future year.`);
+  }
+};
+
+export { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid , checkPassword , checkUsername, checkYear};

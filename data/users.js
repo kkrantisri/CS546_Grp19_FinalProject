@@ -1,6 +1,6 @@
 import { users } from "../config/mongoCollections.js";
 import { ObjectId } from 'mongodb';
-import  { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid, checkPassword, checkUsername } from '../helper.js';
+import  { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid, checkPassword, checkUsername, checkYear } from '../helper.js';
 import bcrypt from 'bcryptjs';
 
 const userCollection = await users();
@@ -33,12 +33,13 @@ export const addUser = async (userData) => {
   const validatedFullName = checkString(fullName, 'fullName');
   const validatedMajor = checkString(major, 'major');
   const validatedLanguages = checkStringArray(languages, 'languages');
-  const validatedCoursesEnrolled = checkStringArray(coursesEnrolled, 'coursesEnrolled');
+  const validatedCoursesEnrolled = checkStringArray(coursesEnrolled, 'courses');
   const validatedBio = checkString(bio, 'bio');
   //gradYear = parseInt(gradYear);
   if (!gradYear || isNaN(parseInt(gradYear)) || parseInt(gradYear) <= 0) {
     throw 'Grad year must be a positive number!';
   }
+  const validatedGradYear = checkYear(gradYear, 'gradYear');
 
   validatedUsername = validatedUsername.toLowerCase();
   validatedEmail = validatedEmail.toLowerCase();
@@ -72,7 +73,7 @@ export const addUser = async (userData) => {
     languages: validatedLanguages,
     coursesEnrolled: validatedCoursesEnrolled,
     bio: validatedBio,
-    gradYear: gradYear,
+    gradYear: validatedGradYear,
     reviews: [],
     role : "user"
   };
@@ -141,17 +142,26 @@ export const getAllUsers = async () => {
 export const updateUser = async (userId, updatedUserData) => {
   try {
     const validatedUserId = checkId(userId, "userId");
-    if (!updatedUserData || typeof updatedUserData !== "object" || Array.isArray(updatedUserData)) {
+    if (
+      !updatedUserData ||
+      typeof updatedUserData !== "object" ||
+      Array.isArray(updatedUserData)
+    ) {
       throw new Error("Invalid or missing updated user data.");
     }
+
     console.log("Validated User ID:", validatedUserId);
+
     const currentUser = await userCollection.findOne({
       _id: new ObjectId(validatedUserId),
     });
+
     console.log("Current User:", currentUser);
+
     if (!currentUser) {
       throw new Error("User not found with the given id.");
     }
+
     const {
       username,
       email,
@@ -162,46 +172,45 @@ export const updateUser = async (userId, updatedUserData) => {
       bio,
       gradYear,
     } = updatedUserData;
-    if (username) {
-      const existingUser = await userCollection.findOne({ username });
-      if (existingUser && existingUser._id.toString() !== validatedUserId) {
-        throw new Error("Username already exists.");
-      }
-    }
-
-    if (email) {
-      const existingUser = await userCollection.findOne({ email });
-      if (existingUser && existingUser._id.toString() !== validatedUserId) {
-        throw new Error("Email already exists.");
-      }
-    }
-    if(gradYear){
-      if ( isNaN(parseInt(gradYear)) || parseInt(gradYear) <= 0) {
-        throw 'Grad year must be a positive number!';
-      }
-
-    }
-   
 
     // Validate and update user fields
     const updatedData = {};
-
-    // Define field validation functions if needed
-    const validateField = (field, value, validationFunction) => {
-      if (value) {
-        updatedData[field] = validationFunction(value);
-      }
-    };
-
-    validateField("fullName", fullName, (value) => checkString(value, "Full name"));
-    validateField("major", major, (value) => checkString(value, "Major"));
-    validateField("languages", languages, (value) =>checkStringArray(value, "Languages"));
-    validateField("coursesEnrolled", coursesEnrolled, (value) => checkStringArray(value, "Courses enrolled"));
-    validateField("bio", bio, (value) => checkString(value, "Bio"));
     
-    validateField("gradYear", gradYear, (value) => checkString(value, "Graduation year"));
+    // Validations
+    if (username && username !== currentUser.username) {
+      updatedData.username = checkString(username, 'Username');
+    }
 
-    // Perform update operation if there are valid changes to apply
+    if (email && email !== currentUser.email) {
+      updatedData.email = checkEmail(email, 'Email');
+    }
+
+    if (fullName && fullName !== currentUser.fullName) {
+      updatedData.fullName = checkString(fullName, 'Full Name');
+    }
+
+    if (major && major !== currentUser.major) {
+      updatedData.major = checkString(major, 'Major');
+    }
+
+    if (languages && Array.isArray(languages) && languages !== currentUser.languages) {
+      updatedData.languages = checkStringArray(languages, 'Languages');
+    }
+
+    if (coursesEnrolled && Array.isArray(coursesEnrolled) && coursesEnrolled !== currentUser.coursesEnrolled) {
+      updatedData.coursesEnrolled = checkStringArray(coursesEnrolled, 'Courses');
+    }
+
+    if (bio && bio !== currentUser.bio) {
+      updatedData.bio = checkString(bio, 'Bio');
+    }
+
+    if (gradYear && gradYear !== currentUser.gradYear) {
+      updatedData.gradYear = checkYear(gradYear, 'Graduation Year');
+    }
+
+
+    // Perform update operation if there are valid changes
     if (Object.keys(updatedData).length > 0) {
       const updatedInfo = await userCollection.findOneAndUpdate(
         { _id: new ObjectId(validatedUserId) },
@@ -215,10 +224,10 @@ export const updateUser = async (userId, updatedUserData) => {
         throw new Error("Could not update user.");
       }
 
-      return updatedInfo.value;
+      return { updateUser: true };
     } else {
       // No valid changes to apply
-      return currentUser;
+      return { updateUser: false };
     }
   } catch (error) {
     console.error("Error in updateUser:", error);
