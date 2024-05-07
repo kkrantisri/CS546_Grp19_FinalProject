@@ -52,6 +52,7 @@ a:hover {
 #logoutLink:hover {
     background-color: #c82333;
 }
+
 /* Reset default styles */
 html, body, h1, h2, h3, h4, h5, h6, p, ul, li, form, input, textarea, button {
     margin: 0;
@@ -170,4 +171,60 @@ button:hover {
         padding: 10px;
     }
 }
+
+
+h3#createsession a ,
+h3#sentsessions a,
+h3#receivedsessions a 
+{ 
+    padding: 2px 7px;
+    background-color: #e1cb0cf2; 
+    color: #fff;
+    text-decoration: none; 
+    border-radius: 4px; 
+    cursor: pointer; 
+}
+
+h3#createsession a:hover,
+h3#sentsessions a:hover,
+h3#receivedsessions a:hover  {
+    background-color: #0056b3; 
+}
+
+.create a {
+    padding: 2px 7px;
+    background-color: #e1cb0cf2; 
+    color: #fff;
+    text-decoration: none; 
+    border-radius: 4px; 
+    cursor: pointer; 
+}
+
+h3.create a:hover {
+    background-color: #0056b3; 
+}
+
+.logout-button {
+    position: absolute;
+    top: -20px;
+    right: 20px;
+}
+
+.logout-button button {
+    padding: 6px 10px;
+    font-size: 16px;
+    background-color: transparent;
+    color: #fff;
+    text-decoration: none;
+    border: 1px solid #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.logout-button button:hover {
+    background-color: #0056b3;
+}
+
+
+
 

@@ -42,8 +42,6 @@ router
       email = xss(email);
       fullName = xss(fullName);
       major = xss(major);
-      languages = xss(languages);
-      coursesEnrolled = xss(coursesEnrolled);
       bio = xss(bio);
       gradYear = xss(gradYear);
       const validatedUsername =  checkUsername(username, 'username');
