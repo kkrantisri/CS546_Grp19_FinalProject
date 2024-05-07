@@ -11,6 +11,7 @@ import {
   isTimeSlotValid,
   checkPassword,
   checkUsername,
+  checkYear
 } from "../helper.js";
 import bcrypt from "bcrypt";
 import xss from "xss";
@@ -35,44 +36,50 @@ router
   })
   .post(async (req, res) => {
     try {
-      let { username, password, email, fullname, major, languages, coursesEnrolled, bio, gradyear } = req.body;
+      let { username, password, email, fullName, major, languages, coursesEnrolled, bio, gradYear } = req.body;
       username = xss(username);
       password = xss(password);
       email = xss(email);
-      fullname = xss(fullname);
+      fullName = xss(fullName);
       major = xss(major);
       bio = xss(bio);
-      gradyear = xss(gradyear);
+      gradYear = xss(gradYear);
       const validatedUsername =  checkUsername(username, 'username');
       const validatedPassword =  checkPassword(password);
       const validatedEmail =  checkEmail(email);
-      const validatedFullName =  checkString(fullname, 'fullName');
+      const validatedFullName =  checkString(fullName, 'fullName');
       const validatedMajor =  checkString(major, 'major');
-      const validatedLanguages =  checkStringArray(languages, 'languages');
-      //coursesEnrolled = coursesEnrolled.split(',');
-      const validatedCoursesEnrolled =  checkStringArray(coursesEnrolled, 'coursesEnrolled');
-      const validatedBio =  checkString(bio, 'bio');
-      //const validatedGradYear =  checkPositiveNumber(gradyear, 'gradYear');
       
+      //coursesEnrolled = coursesEnrolled.split(',');
+      const validatedLanguages = languages.split(',').map(lang => lang.trim());
+      const validatedCoursesEnrolled = coursesEnrolled.split(',').map(course => course.trim());
+
+      // Validate arrays of languages and courses enrolled
+      const validatedLanguagesArray = checkStringArray(validatedLanguages, 'languages');
+      const validatedCoursesEnrolledArray = checkStringArray(validatedCoursesEnrolled, 'coursesEnrolled');
+
+      const validatedBio =  checkString(bio, 'bio');
+      const validatedGradYear =  checkYear(gradYear, 'gradYear');
+
       const newUser = await addUser({
         username: validatedUsername,
         password: validatedPassword,
         email: validatedEmail,
         fullName: validatedFullName,
         major: validatedMajor,
-        languages: validatedLanguages,
-        coursesEnrolled: validatedCoursesEnrolled,
+        languages: validatedLanguagesArray,
+        coursesEnrolled: validatedCoursesEnrolledArray,
         bio: validatedBio,
-        gradYear: gradyear
+        gradYear: validatedGradYear
       });
 
       res.status(200).render('signup', { message: 'Successfully Registered. You can login now.',hasMessage:true });
     } catch (error) {
-      res.status(400).render("signup", {
-        message: error,
-        hasMessage : true,
-        title: "Signup Form",
-      });
+      res.status(400).render('signup', {
+        title: 'Signup Form',
+        hasMessage: true,
+        message: error || error.message || 'Error: Internal Server Error'
+    });
     }
   });
 router
@@ -92,6 +99,7 @@ router
     let errors = [];
     try {
       userData.username = checkString(userData.username,'username');
+      userData.username = checkUsername(userData.username,'username');
     } catch (e) {
       errors.push(e)
     }

@@ -2,7 +2,7 @@ import {Router} from 'express';
 const router = Router();
 import { addUser, getUserById, getUserByUsername, getUserByEmail, getAllUsers, updateUser, getCoursesbyUserName, getReviewsForUser , deleteUserById , createreviewbyuserid } from '../data/users.js';
 import {postData, userData} from '../data/index.js';
-import  { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid, checkUsername } from '../helper.js';
+import  { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid, checkUsername, checkYear } from '../helper.js';
 import xss from 'xss';
 
 router.route('/')
@@ -14,76 +14,84 @@ router.route('/')
       res.status(404).render('error',{message : error});
     }    
   });
-router.route('/edit')
-      .get(async (req , res) => {
-          var user = req.session.user.id ;
-          var userId = user.toString();
-          var usered = await getUserById(userId);
+  router.route('/edit')
+  .get(async (req , res) => {
+    try {
+      const userId = req.session.user.id.toString();
+      const user = await getUserById(userId);
+    
+      const majorOptions = ["Computer Science", "Software Engineering", "Financial Engineering"];
+        const languagesOptions = ["Hindi", "English", "Telugu", "French", "Italian", "Spanish", "German", "Chinese", "Japanese"];
+        const coursesOptions = ["CS546", "CS555", "CS545", "CS570", "CS556", "CS513"];
 
-          res.render('users/editUser', {user : usered});
-      })  .post(async (req, res) => 
-        {
-          var user = req.session.user;
-          var userId = user.id.toString();
-          var updatedUserData = req.body;
-
-          const userr = await getUserById(userId);
-          try{
-            userId = checkId(userId,'userId');
-            
-      
-          if (!updatedUserData || typeof updatedUserData !== 'object' || Array.isArray(updatedUserData)) {
-            throw 'Invalid or missing updated user data.';
+        res.render('users/editUser', { user: user, majorOptions, languagesOptions, coursesOptions });
+    } catch (error) {
+      console.error('Error in GET /edit:', error.message);
+      res.status(500).render('error', { message: 'Internal Server Error' });
+    }
+  })  .post(async (req, res) => 
+    {
+      try {
+        const userId = req.session.user.id.toString();
+        const updatedUserData = req.body;
+    
+        // Validate and update specific user fields
+        const updatedFields = {};
+    
+        // Validations
+        if (updatedUserData.hasOwnProperty('username')) {
+          updatedFields.username = checkUsername(updatedUserData.username, 'Username');
+        }
+        if (updatedUserData.hasOwnProperty('email')) {
+          updatedFields.email = checkEmail(updatedUserData.email, 'Email');
+        }
+        if (updatedUserData.hasOwnProperty('fullName')) {
+          updatedFields.fullName = checkString(updatedUserData.fullName, 'Full Name');
+        }
+        if (updatedUserData.hasOwnProperty('major')) {
+          updatedFields.major = checkString(updatedUserData.major, 'Major');
+        }
+        if (updatedUserData.hasOwnProperty('languages')) {
+          if (!Array.isArray(updatedUserData.languages)) {
+              updatedUserData.languages = updatedUserData.languages ? [updatedUserData.languages] : [];
           }
-            const { username, password, email, fullName, major, languages, coursesEnrolled, bio, gradYear } = updatedUserData;
-          if (updatedUserData.hasOwnProperty("username")) {
-            username = xss(username)
-            var validatedUsername = checkUsername(username, 'username');
-          }
-          if (updatedUserData.hasOwnProperty("email")) {
-            email = user(email)
-            var validatedEmail = checkEmail(email, 'email');
-          }
-          if (updatedUserData.hasOwnProperty("password")) {
-            password = xss(password)
-            var validatedPassword = checkPassword(password);
-          }
-          if (updatedUserData.hasOwnProperty("fullName")) {
-            fullName = xss(fullName)
-            var validatedFullName = checkString(fullName, 'fullName');
-          }
-          if (updatedUserData.hasOwnProperty("major")) {
-            major = xss(major)
-            var validatedMajor = checkString(major, 'major');
-          }
-          if (updatedUserData.hasOwnProperty("languages")) {
-            languages = xss(languages)
-            var validatedLanguages = checkPassword(languages);
-          }
-          if (updatedUserData.hasOwnProperty("coursesEnrolled")) {
-            coursesEnrolled = xss(coursesEnrolled)
-            var validatedCoursesEnrolled = checkStringArray(coursesEnrolled, 'coursesEnrolled');
-          }
-          if (updatedUserData.hasOwnProperty("bio")) {
-            bio = xss(bio)
-            var validatedBio = checkString(bio, 'bio');
-          }
-          if (updatedUserData.hasOwnProperty("gradYear")) {
-            gradYear = xss(gradYear)
-            var validatedGradYear = checkString(gradYear, 'gradYear');
-          }
-          }catch(e){
-            res.status(400).render('users/editUser', {hasErrors : true , error : e, user : userr})
-          }
-          try{
-            const updated = await updateUser(userId ,updatedUserData );
-            if(updated){
-              res.status(200).render('users/editUser', {hasErrors : true , error : 'Successfully Updated' , user : updated})
+          updatedFields.languages = checkStringArray(updatedUserData.languages, 'Languages');
+        }
+        if (updatedUserData.hasOwnProperty('coursesEnrolled')) {
+            if (!Array.isArray(updatedUserData.coursesEnrolled)) {
+                updatedUserData.coursesEnrolled = updatedUserData.coursesEnrolled ? [updatedUserData.coursesEnrolled] : [];
             }
-          }catch(e){
-            res.status(404).render('users/editUser', {hasErrors : true , error : e})
-          }
-        });
+          updatedFields.coursesEnrolled = checkStringArray(updatedUserData.coursesEnrolled, 'Courses');
+        }
+        if (updatedUserData.hasOwnProperty('bio')) {
+          updatedFields.bio = checkString(updatedUserData.bio, 'Bio');
+        }
+        if (updatedUserData.hasOwnProperty('gradYear')) {
+          updatedFields.gradYear = checkYear(updatedUserData.gradYear, 'Graduation Year');
+        }
+    
+        // Perform user update if there are valid changes
+        if (Object.keys(updatedFields).length > 0) {
+          const updatedUser = await updateUser(userId, updatedFields);
+          res.redirect(`/users/${userId}`);
+        } else {
+          // No valid changes to apply
+          console.log('No valid updates provided');
+          res.redirect(`/users/${userId}`);
+        }
+      } catch (error) {
+        console.error('Error in POST /edit:', error);
+
+          const userId = req.session.user.id.toString();
+          const user = await getUserById(userId);
+        
+          const majorOptions = ["Computer Science", "Software Engineering", "Financial Engineering"];
+          const languagesOptions = ["Hindi", "English", "Telugu", "French", "Italian", "Spanish", "German", "Chinese", "Japanese"];
+          const coursesOptions = ["CS546", "CS555", "CS545", "CS570", "CS556", "CS513"];
+
+          res.render('users/editUser', { user: user, error: error, majorOptions, languagesOptions, coursesOptions });
+      }
+    });
 router.get('/:id', async (req, res) => {
         try {
           var id = req.params.id;
