@@ -11,7 +11,7 @@ Once the server is running, navigate to localhost:3000 to launch our website.
 
 ## Test Application
 
-You can create for your own account using the signup form.
+You can create your own account using the signup form.
 
 If you'd like to log in to an existing account, use the following credentials:
 - **Username:** Duckpal
